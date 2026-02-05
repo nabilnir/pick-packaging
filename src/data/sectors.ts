@@ -5,7 +5,7 @@ export const SECTOR_DATA = [
         shortTitle: 'Food Service',
         description: 'Deliver meals that look good, travel well and impress customers with attention to detail. We can help you customise packaging so it matches the quality of your food and reflects the image you want to exude.',
         shortDescription: 'Deliver meals that look good, travel well and impress customers with attention to detail.',
-        image: 'https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/9f0c5c9d-15b1-4e58-90e5-ab72d52b9c7d-yucca-co-za/assets/images/yucca-packaging-for-food-service-takeout-catering--8.jpg',
+        image: '/images/food-processing.png',
         ctaLink: '/sectors/food-service'
     },
     {

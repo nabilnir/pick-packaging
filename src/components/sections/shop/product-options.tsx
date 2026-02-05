@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Minus, Plus } from 'lucide-react';
+import Image from 'next/image';
 
 interface PackingType {
     name: string;
@@ -117,7 +118,7 @@ const ProductOptions = ({ basePrice, currency, volumes, packingTypes }: ProductO
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8 text-[13px]">
                 <div className="flex gap-4">
                     <div className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center shrink-0">
-                        <Image src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/9f0c5c9d-15b1-4e58-90e5-ab72d52b9c7d-yucca-co-za/assets/images/yucca-packaging-for-food-service-takeout-catering--8.jpg" alt="Arrival" width={20} height={20} className="opacity-40" />
+                        <Image src="/images/food-processing.png" alt="Arrival" width={20} height={20} className="opacity-40" />
                     </div>
                     <div>
                         <div className="font-semibold mb-1">Estimated Arrival</div>
@@ -126,7 +127,7 @@ const ProductOptions = ({ basePrice, currency, volumes, packingTypes }: ProductO
                 </div>
                 <div className="flex gap-4">
                     <div className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center shrink-0">
-                        <Image src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/9f0c5c9d-15b1-4e58-90e5-ab72d52b9c7d-yucca-co-za/assets/images/yucca-packaging-for-food-service-takeout-catering--8.jpg" alt="Collection" width={20} height={20} className="opacity-40" />
+                        <Image src="/images/food-processing.png" alt="Collection" width={20} height={20} className="opacity-40" />
                     </div>
                     <div>
                         <div className="font-semibold mb-1">Prefer to collect?</div>
@@ -136,7 +137,7 @@ const ProductOptions = ({ basePrice, currency, volumes, packingTypes }: ProductO
             </div>
 
             <p className="text-[12px] opacity-40 mt-8 italic">
-                Please note: delivery fees will be calculated at checkout. Free delivery for orders over R2000 incl. VAT.
+                Please note: delivery fees will be calculated at checkout. Free delivery for orders over £100 incl. VAT.
             </p>
         </div>
     );

@@ -8,7 +8,9 @@ import Header from '@/components/sections/header';
 import Footer from '@/components/sections/footer';
 import { useAuth } from '@/contexts/auth-context';
 
-const LoginPage = () => {
+import { Suspense } from 'react';
+
+const LoginForm = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { login, loginWithGoogle } = useAuth();
@@ -186,6 +188,14 @@ const LoginPage = () => {
 
             <Footer />
         </div>
+    );
+};
+
+const LoginPage = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <LoginForm />
+        </Suspense>
     );
 };
 

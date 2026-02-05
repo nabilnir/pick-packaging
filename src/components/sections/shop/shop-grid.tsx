@@ -200,7 +200,7 @@ const ShopGrid = () => {
                                         <div className="absolute inset-0 bg-[url('/images/delivery-line.png')] bg-contain bg-no-repeat opacity-40 group-hover:translate-x-4 transition-transform duration-700" />
                                         <div className="w-full h-full border-b border-foreground/10 flex items-center justify-center">
                                             <Image
-                                                src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/9f0c5c9d-15b1-4e58-90e5-ab72d52b9c7d-yucca-co-za/assets/images/yucca-packaging-for-food-service-takeout-catering--8.jpg"
+                                                src="/images/food-processing.png"
                                                 alt="Delivery"
                                                 fill
                                                 className="object-contain opacity-20 grayscale"
