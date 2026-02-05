@@ -1,0 +1,1868 @@
+[
+    {
+        "id": "yucca-001",
+        "name": "Dome Lid Cross Hole (95mm)",
+        "slug": "dome-lid-cross-hole-95mm",
+        "price": 0.75,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Cold Cups",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2026/01/YP-JYD95P-CH-1200x1200.jpg",
+        "isNew": true,
+        "inStock": true,
+        "description": "Premium 95mm dome lid with a cross-cut hole for straws. Crystal clear for great visibility.",
+        "volumes": [
+            "95mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_001"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-002",
+        "name": "Dessert Cup Dome Lid (90mm)",
+        "slug": "dessert-cup-dome-lid-90mm",
+        "price": 0.63,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Dessert",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2026/01/YP-JYD90-1200x1200.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Curved dome lid designed to fit 90mm dessert cups, allowing space for toppings.",
+        "volumes": [
+            "90mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_002"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-003",
+        "name": "Yellow Lunch Box",
+        "slug": "yellow-lunch-box-1400ml",
+        "price": 3.45,
+        "currency": "£",
+        "category": "Containers",
+        "subCategory": "Takeaway",
+        "material": "Polypropylene",
+        "image": "https://yucca.co.za/wp-content/uploads/2026/01/JH-D-002-W-1200x1200.jpg",
+        "isNew": true,
+        "inStock": true,
+        "description": "Large 1400ml vibrant yellow lunch box, perfect for meal prep and heavy takeaways.",
+        "volumes": [
+            "1400ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Unit",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_003"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-004",
+        "name": "PET Salad Bowl With Dome Lid",
+        "slug": "pet-salad-bowl-dome-lid-750ml",
+        "price": 5.75,
+        "currency": "£",
+        "category": "Bowls",
+        "subCategory": "Salad",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/CJ-16DL.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "All-in-one salad solution. 750ml clear bowl with a high-profile dome lid.",
+        "volumes": [
+            "750ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Combo",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_004"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-005",
+        "name": "PET Salad Bowl With Flat Lid",
+        "slug": "pet-salad-bowl-flat-lid",
+        "price": 2.76,
+        "currency": "£",
+        "category": "Bowls",
+        "subCategory": "Salad",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/CJ-12FL.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Clear PET salad bowl with a space-saving flat lid. Ideal for stackable storage.",
+        "volumes": [
+            "350ml",
+            "500ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Combo",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_005"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-006",
+        "name": "Confectionery Tray",
+        "slug": "confectionery-tray",
+        "price": 3.68,
+        "currency": "£",
+        "category": "Trays",
+        "subCategory": "Bakery",
+        "material": "Plastic",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YCT0.50000.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Transparent tray designed for pastries, biscuits, and confectionery display.",
+        "volumes": [
+            "500ml",
+            "1000ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Unit",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_006"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-007",
+        "name": "Bagasse Gourmet Burger Box",
+        "slug": "bagasse-gourmet-burger-box",
+        "price": 2.65,
+        "currency": "£",
+        "category": "Eco-Friendly",
+        "subCategory": "Burger Box",
+        "material": "Bagasse",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-ES013.jpg",
+        "isNew": true,
+        "inStock": true,
+        "description": "Compostable burger box made from sugarcane pulp. Breathable and eco-friendly.",
+        "volumes": [
+            "450ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_007"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-008",
+        "name": "Bagasse 1200ml 3-Comp Clamshell",
+        "slug": "bagasse-3-compartment-clamshell",
+        "price": 4.95,
+        "currency": "£",
+        "category": "Eco-Friendly",
+        "subCategory": "Lunch Box",
+        "material": "Bagasse",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-ES018.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Three-compartment eco-box for separating mains and sides. 1200ml total capacity.",
+        "volumes": [
+            "1200ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_008"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-009",
+        "name": "Kraft Lunch Box Divided",
+        "slug": "kraft-lunch-box-divided",
+        "price": 6.56,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Lunch Box",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-TD-005.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Divided kraft paper box with a PE lining to prevent grease leakage.",
+        "volumes": [
+            "580ml",
+            "950ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Unit",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_009"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-010",
+        "name": "PET Insert (98mm)",
+        "slug": "pet-insert-98mm",
+        "price": 0.69,
+        "currency": "£",
+        "category": "Accessories",
+        "subCategory": "Cup Inserts",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-INSERT-60.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Internal cup insert for muesli, granola, or sauces. Fits 98mm rim cups.",
+        "volumes": [
+            "60ml",
+            "120ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_010"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-011",
+        "name": "Sauce Tub Flat Lid",
+        "slug": "sauce-tub-flat-lid",
+        "price": 0.2,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Sauce",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-JYF45.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Secure flat lid for small sauce portions. Leak-proof design.",
+        "volumes": [
+            "45mm",
+            "62mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Box",
+                "units": 1000,
+                "priceMultiplier": 1,
+                "_id": "pk_011"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-012",
+        "name": "Dessert Cup (90mm)",
+        "slug": "dessert-cup-90mm",
+        "price": 1.38,
+        "currency": "£",
+        "category": "Cups",
+        "subCategory": "Dessert",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-JU9.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Elegant 90mm rim dessert cup for puddings, fruit, and yogurt parfaits.",
+        "volumes": [
+            "250ml",
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_012"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-013",
+        "name": "Dessert Cup Flat Lid (90mm)",
+        "slug": "dessert-cup-flat-lid-90mm",
+        "price": 0.63,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Dessert",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/08/YP-JYF90-1200x1200.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Flat, non-hole lid for 90mm dessert cups. Keeps contents safe during transport.",
+        "volumes": [
+            "90mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_013"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-014",
+        "name": "Round Tub (95mm)",
+        "slug": "round-tub-95mm",
+        "price": 1.61,
+        "currency": "£",
+        "category": "Containers",
+        "subCategory": "Deli",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-YRT-125.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Clear round deli tub for salads, snacks, or dips. 95mm diameter.",
+        "volumes": [
+            "250ml",
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_014"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-015",
+        "name": "Round Tub Lid (95mm)",
+        "slug": "round-tub-lid-95mm",
+        "price": 0.58,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Deli",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-YRL95PETNH.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Matching lid for the 95mm round tub. Available in vented or solid options.",
+        "volumes": [
+            "No Hole",
+            "Punched Hole"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_015"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-016",
+        "name": "Bubble Tea Cup (95mm)",
+        "slug": "bubble-tea-cup-95mm",
+        "price": 1.61,
+        "currency": "£",
+        "category": "Cups",
+        "subCategory": "Cold Drink",
+        "material": "Polypropylene",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-JYPU16.jpg",
+        "isNew": true,
+        "inStock": true,
+        "description": "Standard U-shape bubble tea cup. Heavy-duty and heat-sealable.",
+        "volumes": [
+            "500ml",
+            "700ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_016"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-017",
+        "name": "Flat Lid With Cross Hole",
+        "slug": "flat-lid-cross-hole",
+        "price": 0.52,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Cold Cups",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-JYF78.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Economical flat lid with a pre-cut straw hole.",
+        "volumes": [
+            "78mm",
+            "98mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Box",
+                "units": 1000,
+                "priceMultiplier": 1,
+                "_id": "pk_017"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-018",
+        "name": "250ml PET Cup (78mm)",
+        "slug": "250ml-pet-cup-78mm",
+        "price": 1.15,
+        "currency": "£",
+        "category": "Cups",
+        "subCategory": "Cold Drink",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-JB9A-78.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Standard 250ml cold drink cup with a 78mm rim diameter.",
+        "volumes": [
+            "250ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_018"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-019",
+        "name": "Dome Lid With Cross Hole (78mm)",
+        "slug": "dome-lid-cross-hole-78mm",
+        "price": 0.52,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Cold Cups",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-JYD78.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Dome lid with a straw hole specifically designed for 78mm cups.",
+        "volumes": [
+            "78mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_019"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-020",
+        "name": "Smoothie Cup (98mm)",
+        "slug": "smoothie-cup-98mm",
+        "price": 1.55,
+        "currency": "£",
+        "category": "Cups",
+        "subCategory": "Cold Drink",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-JB14A-98.jpg",
+        "isNew": true,
+        "inStock": true,
+        "description": "Large smoothie cup with 98mm wide rim. Sturdy and crystal clear.",
+        "volumes": [
+            "350ml",
+            "500ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_020"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-021",
+        "name": "Dome Lid With Cross Hole (98mm)",
+        "slug": "dome-lid-cross-hole-98mm",
+        "price": 0.69,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Cold Cups",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-JYD98-CH.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Standard 98mm dome lid with straw cross-slot. Fits most large smoothie cups.",
+        "volumes": [
+            "98mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_021"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-022",
+        "name": "Dome Lid With Open Hole (98mm)",
+        "slug": "dome-lid-open-hole-98mm",
+        "price": 0.69,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Cold Cups",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-JYD98-OH.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "98mm dome lid with a wide open hole for thick straws or spoon-straws.",
+        "volumes": [
+            "98mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_022"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-023",
+        "name": "Paper Pulp Cup Holder",
+        "slug": "paper-pulp-cup-holder",
+        "price": 1.55,
+        "currency": "£",
+        "category": "Accessories",
+        "subCategory": "Carriers",
+        "material": "Recycled Pulp",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/KG-CH-2.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Sturdy, biodegradable cup carriers. Available in 2-cup and 4-cup configurations.",
+        "volumes": [
+            "2-Holder",
+            "4-Holder"
+        ],
+        "packingTypes": [
+            {
+                "name": "Bundle",
+                "units": 25,
+                "priceMultiplier": 1,
+                "_id": "pk_023"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-024",
+        "name": "Kraft Wrap Box With Middle Tear",
+        "slug": "kraft-wrap-box-tear",
+        "price": 4.5,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Wraps",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/MY01WB210.jpg",
+        "isNew": true,
+        "inStock": true,
+        "description": "Innovative wrap box featuring a middle perforated tear for easy eating on the go.",
+        "volumes": [
+            "Large"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_024"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-025",
+        "name": "Kraft Sandwich Box With PET Window",
+        "slug": "kraft-sandwich-box-window",
+        "price": 3.45,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Sandwich",
+        "material": "Kraft + PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/MY1SANK72.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Eco-friendly kraft sandwich wedge with a clear window for freshness visibility.",
+        "volumes": [
+            "Medium"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_025"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-026",
+        "name": "Kraft Closable Chip Cup",
+        "slug": "kraft-closable-chip-cup",
+        "price": 1.44,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Sides",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/MY1CSCK140.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Self-closing chip cup to keep fries warm and secure during delivery.",
+        "volumes": [
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_026"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-027",
+        "name": "Kraft Open Chip Cup",
+        "slug": "kraft-open-chip-cup",
+        "price": 1.38,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Sides",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/MY1OWCK5.5.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Angled open chip cup for easy access and stylish presentation.",
+        "volumes": [
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_027"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-028",
+        "name": "Kraft Chip Cone",
+        "slug": "kraft-chip-cone",
+        "price": 1.84,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Sides",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/MY1FCK23.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Classic chip cone design, perfect for street food and casual catering.",
+        "volumes": [
+            "Medium"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 100,
+                "priceMultiplier": 1,
+                "_id": "pk_028"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-029",
+        "name": "Kraft Wrap Box With PLA Window",
+        "slug": "kraft-wrap-box-pla",
+        "price": 4.6,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Wraps",
+        "material": "Kraft + PLA",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/MY01KRAP120.jpg",
+        "isNew": true,
+        "inStock": true,
+        "description": "100% compostable wrap box using a plant-based PLA window.",
+        "volumes": [
+            "121mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_029"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-030",
+        "name": "Coffee Cup Sip Lid – Black",
+        "slug": "coffee-cup-sip-lid-black",
+        "price": 0.63,
+        "currency": "£",
+        "category": "Beverage",
+        "subCategory": "Hot Lids",
+        "material": "Plastic",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/08/KG-SIP-B-80-1200x1200.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Sleek black sip-through lid for standard hot coffee cups.",
+        "volumes": [
+            "80mm",
+            "90mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_030"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-031",
+        "name": "Coffee Cup Sip Lid – White",
+        "slug": "coffee-cup-sip-lid-white",
+        "price": 0.63,
+        "currency": "£",
+        "category": "Beverage",
+        "subCategory": "Hot Lids",
+        "material": "Plastic",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/08/KG-SIP-W-80-1200x1200.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Classic white sip-through lid. Heat resistant and secure fit.",
+        "volumes": [
+            "80mm",
+            "90mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_031"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-032",
+        "name": "Double Wall White Ripple Coffee Cup",
+        "slug": "double-wall-white-ripple",
+        "price": 2.13,
+        "currency": "£",
+        "category": "Beverage",
+        "subCategory": "Hot Cups",
+        "material": "Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/KG-DW-WR-250.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "White ripple-textured wall provides superior heat insulation for the hand.",
+        "volumes": [
+            "250ml",
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 25,
+                "priceMultiplier": 1,
+                "_id": "pk_032"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-033",
+        "name": "Double Wall Bean Ripple Coffee Cup",
+        "slug": "double-wall-bean-ripple",
+        "price": 2.13,
+        "currency": "£",
+        "category": "Beverage",
+        "subCategory": "Hot Cups",
+        "material": "Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/KG-DW-BGR-250.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Stylish bean-patterned ripple cup. Double wall design eliminates the need for sleeves.",
+        "volumes": [
+            "250ml",
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 25,
+                "priceMultiplier": 1,
+                "_id": "pk_033"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-034",
+        "name": "Double Wall Black Ripple Coffee Cup",
+        "slug": "double-wall-black-ripple",
+        "price": 2.13,
+        "currency": "£",
+        "category": "Beverage",
+        "subCategory": "Hot Cups",
+        "material": "Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/KG-DW-BR-250.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Premium matte black ripple cup. Double wall insulation for hot beverages.",
+        "volumes": [
+            "250ml",
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 25,
+                "priceMultiplier": 1,
+                "_id": "pk_034"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-035",
+        "name": "Kraft Paper Noodle Box",
+        "slug": "kraft-noodle-box",
+        "price": 2.47,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Food Box",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/KG-KNB-500.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Grease-resistant noodle box with a built-in wire-free closure.",
+        "volumes": [
+            "500ml",
+            "750ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_035"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-036",
+        "name": "Single Wall White Coffee Cup",
+        "slug": "single-wall-white-cup",
+        "price": 1.09,
+        "currency": "£",
+        "category": "Beverage",
+        "subCategory": "Hot Cups",
+        "material": "Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/KG-SW-W-250.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Standard white single-wall cup. Lightweight and economical.",
+        "volumes": [
+            "250ml",
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_036"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-037",
+        "name": "Single Wall Matte Black Coffee Cup",
+        "slug": "single-wall-black-cup",
+        "price": 1.09,
+        "currency": "£",
+        "category": "Beverage",
+        "subCategory": "Hot Cups",
+        "material": "Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/08/KG-SW-B-250-1200x1200.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Contemporary matte black finish for a premium coffee experience.",
+        "volumes": [
+            "250ml",
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_037"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-038",
+        "name": "Single Wall Cappuccino Coffee Cup",
+        "slug": "single-wall-cappuccino-cup",
+        "price": 1.09,
+        "currency": "£",
+        "category": "Beverage",
+        "subCategory": "Hot Cups",
+        "material": "Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/KG-SW-CB-250.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Single-wall cup with a classic cappuccino print design.",
+        "volumes": [
+            "250ml",
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_038"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-039",
+        "name": "Double Wall Kraft Coffee Cup",
+        "slug": "double-wall-kraft-cup",
+        "price": 2.07,
+        "currency": "£",
+        "category": "Beverage",
+        "subCategory": "Hot Cups",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/KG-DW-K-250.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Eco-look kraft coffee cup with double-wall construction for heat protection.",
+        "volumes": [
+            "250ml",
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 25,
+                "priceMultiplier": 1,
+                "_id": "pk_039"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-040",
+        "name": "Double Wall Kraft Ripple Coffee Cup",
+        "slug": "double-wall-kraft-ripple",
+        "price": 2.13,
+        "currency": "£",
+        "category": "Beverage",
+        "subCategory": "Hot Cups",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/KG-DW-KR-250.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Combines the natural kraft aesthetic with the superior grip of a ripple wall.",
+        "volumes": [
+            "250ml",
+            "350ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 25,
+                "priceMultiplier": 1,
+                "_id": "pk_040"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-041",
+        "name": "Kraft Paper Tray Low Profile",
+        "slug": "kraft-paper-tray-low-profile",
+        "price": 1.38,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Trays",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-MT6.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Low-profile tray ideal for serving open-faced sandwiches, snacks, or small bites.",
+        "volumes": [
+            "430ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 100,
+                "priceMultiplier": 1,
+                "_id": "pk_041"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-042",
+        "name": "Kraft Paper Bag",
+        "slug": "kraft-paper-bag",
+        "price": 3.28,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Bags",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-BTH2.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Sturdy natural kraft paper bag with handles, available in multiple retail sizes.",
+        "volumes": [
+            "210*170mm",
+            "250*270mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_042"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-043",
+        "name": "Kraft Paper Boat Tray",
+        "slug": "kraft-paper-boat-tray",
+        "price": 0.81,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Trays",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-BST01.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Eco-friendly boat tray for hot dogs, fries, and street food applications.",
+        "volumes": [
+            "120ml",
+            "200ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 250,
+                "priceMultiplier": 1,
+                "_id": "pk_043"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-044",
+        "name": "White Paper Burger Box",
+        "slug": "white-paper-burger-box",
+        "price": 1.44,
+        "currency": "£",
+        "category": "Takeaway",
+        "subCategory": "Burger Box",
+        "material": "Paperboard",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-G-Burger.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Classic white paperboard burger box with a secure locking tab.",
+        "volumes": [
+            "440ml",
+            "650ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_044"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-045",
+        "name": "Kraft Portion 2/D Rectangular Bowl Lid",
+        "slug": "kraft-portion-rectangular-bowl-lid",
+        "price": 2.65,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Kraft Lids",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-TFR-LID.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Clear PET lid specifically designed to fit the 2-division rectangular kraft bowls.",
+        "volumes": [
+            "216mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_045"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-046",
+        "name": "Kraft Portion 2/D Rectangular Bowl",
+        "slug": "kraft-portion-rectangular-bowl",
+        "price": 3.68,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Bowls",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-TFR-800B.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Rectangular bowl with a divider, perfect for meal combos and portion control.",
+        "volumes": [
+            "800ml",
+            "1000ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Unit",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_046"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-047",
+        "name": "Kraft Paper 2/D Rectangular Bowl",
+        "slug": "kraft-paper-2d-bowl",
+        "price": 3.22,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Bowls",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-TRS-700B.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Standard 2-division rectangular bowl for efficient food organization.",
+        "volumes": [
+            "700ml",
+            "900ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Unit",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_047"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-048",
+        "name": "Kraft Paper Rectangular Display Tray Lid",
+        "slug": "kraft-display-tray-lid",
+        "price": 1.27,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Tray Lids",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-LST01.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Protective clear lid for rectangular display trays, maintaining food hygiene.",
+        "volumes": [
+            "140mm",
+            "160mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_048"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-049",
+        "name": "Kraft Paper Rectangular Tray",
+        "slug": "kraft-paper-rectangular-tray",
+        "price": 2.53,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Trays",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-RS-500B.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Versatile rectangular tray for pastries, meats, or pre-packaged salads.",
+        "volumes": [
+            "500ml",
+            "700ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Unit",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_049"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-050",
+        "name": "Kraft Paper Rectangular Tray Lid",
+        "slug": "kraft-rectangular-tray-lid",
+        "price": 2.47,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Tray Lids",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-RS-RTL01.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "High-clarity lid for larger rectangular trays, featuring a snap-on secure fit.",
+        "volumes": [
+            "184mm",
+            "216mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_050"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-051",
+        "name": "Kraft Rectangular Display Tray",
+        "slug": "kraft-rectangular-display-tray",
+        "price": 1.38,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Trays",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-ST-01.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Small-format display tray, perfect for individual sushi portions or desserts.",
+        "volumes": [
+            "175ml",
+            "240ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 100,
+                "priceMultiplier": 1,
+                "_id": "pk_051"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-052",
+        "name": "Kraft Paper Square Tray Lid",
+        "slug": "kraft-square-tray-lid",
+        "price": 1.61,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Tray Lids",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-S-124Lid.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Durable clear lid for square kraft trays. Stackable and leak-resistant.",
+        "volumes": [
+            "124mm",
+            "141mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_052"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-053",
+        "name": "Kraft Paper Square Tray",
+        "slug": "kraft-square-tray",
+        "price": 1.9,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Trays",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-S-300B.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Deep square tray designed for pasta dishes and layered salads.",
+        "volumes": [
+            "300ml",
+            "400ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Unit",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_053"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-054",
+        "name": "Kraft Paper Square Rounded Bottom Bowl Lid",
+        "slug": "kraft-rounded-bottom-bowl-lid",
+        "price": 1.84,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Bowl Lids",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-FBS-128PET.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Specialized lid designed for rounded-bottom square bowls for a modern look.",
+        "volumes": [
+            "128mm",
+            "175mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_054"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-055",
+        "name": "Kraft Paper Square Rounded Bottom Bowl",
+        "slug": "kraft-rounded-bottom-bowl",
+        "price": 2.36,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Bowls",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-FBS-500B.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Unique rounded bottom design offers a premium feel for gourmet takeaway meals.",
+        "volumes": [
+            "500ml",
+            "650ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Unit",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_055"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-056",
+        "name": "Kraft Square Salad Bowl PET Lid",
+        "slug": "kraft-square-salad-bowl-lid",
+        "price": 1.67,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Bowl Lids",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-BS-130PETLID.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Standard PET lid for square salad bowls, providing an airtight seal.",
+        "volumes": [
+            "130mm",
+            "170mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_056"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-057",
+        "name": "Kraft Paper Square Salad Bowl",
+        "slug": "kraft-square-salad-bowl",
+        "price": 2.65,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Bowls",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-BS-500B.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Sturdy square salad bowl, perfect for large meal portions.",
+        "volumes": [
+            "500ml",
+            "650ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Unit",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_057"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-058",
+        "name": "Kraft Rectangular Bowl & Lid Combo",
+        "slug": "kraft-rectangular-bowl-combo",
+        "price": 4.72,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Combos",
+        "material": "Kraft + PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-R-750B-C.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Convenient combo pack including both the rectangular bowl and matching lid.",
+        "volumes": [
+            "750ml",
+            "880ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Combo",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_058"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-059",
+        "name": "White Paper Soup Tub (115mm)",
+        "slug": "white-soup-tub-115mm",
+        "price": 2.13,
+        "currency": "£",
+        "category": "Takeaway",
+        "subCategory": "Soup Tubs",
+        "material": "Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-PSB-20D.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "High-quality white soup tub designed to hold hot liquids without leaking.",
+        "volumes": [
+            "500ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_059"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-060",
+        "name": "Kraft Paper Salad Bowl",
+        "slug": "kraft-salad-bowl-round",
+        "price": 2.42,
+        "currency": "£",
+        "category": "Kraft Paper",
+        "subCategory": "Bowls",
+        "material": "Kraft Paper",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-H-500B.jpg",
+        "isNew": true,
+        "inStock": true,
+        "description": "Classic round salad bowl with greaseproof lining, perfect for poke bowls.",
+        "volumes": [
+            "500ml",
+            "750ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Unit",
+                "units": 1,
+                "priceMultiplier": 1,
+                "_id": "pk_060"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-061",
+        "name": "Kraft Paper Salad Bowl Lid",
+        "slug": "kraft-salad-bowl-lid",
+        "price": 1.96,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Bowl Lids",
+        "material": "PET",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-H-Lid.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Clear anti-fog PET lid for round kraft salad bowls. Ensures a tight seal for delivery.",
+        "volumes": [
+            "150mm",
+            "185mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_061"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-062",
+        "name": "Kraft Paper Soup Tub Lid",
+        "slug": "kraft-soup-tub-lid",
+        "price": 1.44,
+        "currency": "£",
+        "category": "Lids",
+        "subCategory": "Soup Lids",
+        "material": "Paper / PP",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-PSB-Lid.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Vented paper lid for hot soups, allowing steam to escape while preventing spills.",
+        "volumes": [
+            "115mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Sleeve",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_062"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-063",
+        "name": "Bagasse Round Plate",
+        "slug": "bagasse-round-plate",
+        "price": 1.25,
+        "currency": "£",
+        "category": "Eco-Friendly",
+        "subCategory": "Plates",
+        "material": "Bagasse",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-ES001.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Heavy-duty compostable plate. Soak-proof and microwave safe.",
+        "volumes": [
+            "180mm",
+            "230mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_063"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-064",
+        "name": "Bagasse Oval Plate",
+        "slug": "bagasse-oval-plate",
+        "price": 2.1,
+        "currency": "£",
+        "category": "Eco-Friendly",
+        "subCategory": "Plates",
+        "material": "Bagasse",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-ES005.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Large oval sugarcane plate, ideal for main courses with multiple sides.",
+        "volumes": [
+            "260mm",
+            "320mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_064"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-065",
+        "name": "Bagasse Round Bowl",
+        "slug": "bagasse-round-bowl",
+        "price": 1.75,
+        "currency": "£",
+        "category": "Eco-Friendly",
+        "subCategory": "Bowls",
+        "material": "Bagasse",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-ES009.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Eco-friendly round bowl suitable for hot or cold food items.",
+        "volumes": [
+            "350ml",
+            "500ml"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_065"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-066",
+        "name": "Wooden Fork",
+        "slug": "wooden-fork-160mm",
+        "price": 0.55,
+        "currency": "£",
+        "category": "Eco-Friendly",
+        "subCategory": "Cutlery",
+        "material": "Birchwood",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-ESWC001.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Sustainable birchwood fork, sanded for a smooth finish.",
+        "volumes": [
+            "160mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 100,
+                "priceMultiplier": 1,
+                "_id": "pk_066"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-067",
+        "name": "Wooden Knife",
+        "slug": "wooden-knife-165mm",
+        "price": 0.55,
+        "currency": "£",
+        "category": "Eco-Friendly",
+        "subCategory": "Cutlery",
+        "material": "Birchwood",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-ESWC002.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Biodegradable wooden knife, strong enough for most takeaway meals.",
+        "volumes": [
+            "165mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 100,
+                "priceMultiplier": 1,
+                "_id": "pk_067"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-068",
+        "name": "Wooden Spoon",
+        "slug": "wooden-spoon-160mm",
+        "price": 0.55,
+        "currency": "£",
+        "category": "Eco-Friendly",
+        "subCategory": "Cutlery",
+        "material": "Birchwood",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-ESWC003.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Eco-friendly wooden spoon for desserts or hot meals.",
+        "volumes": [
+            "160mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 100,
+                "priceMultiplier": 1,
+                "_id": "pk_068"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-069",
+        "name": "Wooden Stirrer",
+        "slug": "wooden-stirrer",
+        "price": 0.09,
+        "currency": "£",
+        "category": "Beverage",
+        "subCategory": "Accessories",
+        "material": "Wood",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-ESWC036.jpg",
+        "isNew": false,
+        "inStock": true,
+        "description": "Natural birchwood coffee stirrers, splinter-free.",
+        "volumes": [
+            "140mm",
+            "178mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Box",
+                "units": 1000,
+                "priceMultiplier": 1,
+                "_id": "pk_069"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    },
+    {
+        "id": "yucca-070",
+        "name": "Bagasse Square Plates",
+        "slug": "bagasse-square-plates",
+        "price": 1.5,
+        "currency": "£",
+        "category": "Eco-Friendly",
+        "subCategory": "Plates",
+        "material": "Bagasse",
+        "image": "https://yucca.co.za/wp-content/uploads/2025/09/YP-ES021.jpg",
+        "isNew": true,
+        "inStock": true,
+        "description": "Square sugarcane plates, perfect for modern catering and events.",
+        "volumes": [
+            "155mm",
+            "260mm"
+        ],
+        "packingTypes": [
+            {
+                "name": "Pack",
+                "units": 50,
+                "priceMultiplier": 1,
+                "_id": "pk_070"
+            }
+        ],
+        "createdAt": "2026-02-05T06:22:33.262Z"
+    }
+]

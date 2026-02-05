@@ -1,26 +1,297 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@font-face {
+  font-family: 'Magnetik';
+  src: url('../fonts/Magnetik-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@font-face {
+  font-family: 'Magnetik';
+  src: url('../fonts/Magnetik-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@font-face {
+  font-family: 'Magnetik';
+  src: url('../fonts/Magnetik-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Magnetik';
+  src: url('../fonts/Magnetik-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Magnetik';
+  src: url('../fonts/Magnetik-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: 'Magnetik', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Magnetik', sans-serif;
+  --font-magnetik: "Magnetik", sans-serif;
+
+  --color-background: #FFFDF5;
+  --color-foreground: #12271D;
+
+  --color-card: rgba(18, 39, 29, 0.03);
+  --color-card-foreground: #12271D;
+
+  --color-popover: #BFC0AC;
+  --color-popover-foreground: #12271D;
+
+  --color-primary: #12271D;
+  --color-primary-foreground: #BFC0AC;
+
+  --color-secondary: #BFC0AC;
+  --color-secondary-foreground: #12271D;
+
+  --color-muted: rgba(18, 39, 29, 0.1);
+  --color-muted-foreground: #4A4843;
+
+  --color-accent: #A8A59C;
+  --color-accent-foreground: #2D2D2D;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-input: rgba(255, 255, 255, 0.1);
+  --color-ring: #A8A59C;
+
+  --color-chart-1: #A8A59C;
+  --color-chart-2: #BAB7AE;
+  --color-chart-3: #4A4843;
+  --color-chart-4: #2D2D2D;
+  --color-chart-5: #1A1A1A;
+
+  --color-sidebar: #2D2D2D;
+  --color-sidebar-foreground: #BAB7AE;
+  --color-sidebar-primary: #FFFFFF;
+  --color-sidebar-primary-foreground: #2D2D2D;
+  --color-sidebar-accent: rgba(255, 255, 255, 0.05);
+  --color-sidebar-accent-foreground: #FFFFFF;
+  --color-sidebar-border: rgba(255, 255, 255, 0.1);
+  --color-sidebar-ring: #A8A59C;
+
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  --color-brand-green: #12271D;
+  --color-brand-olive: #BFC0AC;
+  --color-brand-taupe: #4A4843;
+  --color-brand-charcoal: #2D2D2D;
+  --color-brand-stone: #A8A59C;
+  --color-brand-beige: #BAB7AE;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+
+    to {
+      height: 0;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border);
+  }
+
+  :root {
+    --background: #FFFDF5;
+    --foreground: #12271D;
+    --font-display: "Magnetik", "Inter", ui-sans-serif, system-ui, sans-serif;
+    --card: rgba(18, 39, 29, 0.05);
+    --card-foreground: #12271D;
+    --popover: #BFC0AC;
+    --popover-foreground: #12271D;
+    --primary: #12271D;
+    --primary-foreground: #BFC0AC;
+    --secondary: #BFC0AC;
+    --secondary-foreground: #12271D;
+    --muted: rgba(18, 39, 29, 0.1);
+    --muted-foreground: #4A4843;
+    --accent: #A8A59C;
+    --accent-foreground: #12271D;
+    --destructive: #ef4444;
+    --destructive-foreground: #fafafa;
+    --border: rgba(18, 39, 29, 0.1);
+    --input: rgba(18, 39, 29, 0.1);
+    --ring: #12271D;
+    --radius: 1.25rem;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  h1,
+  .text-h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  h2,
+  .text-h2 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  h3,
+  .text-h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 1.3;
+  }
+
+  p {
+    font-size: 1.125rem;
+    font-weight: 300;
+    color: var(--color-foreground);
+  }
+
+  .text-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .container {
+      padding-left: 4rem;
+      padding-right: 4rem;
+    }
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+  }
+
+  .section-padding {
+    padding-top: 120px;
+    padding-bottom: 120px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .marquee-container {
+    display: flex;
+    overflow: hidden;
+    user-select: none;
+    gap: 2rem;
+  }
+
+  .marquee-content {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-around;
+    min-width: 100%;
+    gap: 2rem;
+    animation: scroll 40s linear infinite;
+  }
+
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-100%);
+    }
+  }
 }
