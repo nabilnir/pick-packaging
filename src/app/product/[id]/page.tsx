@@ -3,11 +3,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronRight, ChevronDown, ChevronUp, Minus, Plus, ZoomIn, X, ShoppingCart } from 'lucide-react';
+import { ChevronRight, ChevronDown, ChevronUp, Minus, Plus, ZoomIn, ShoppingCart } from 'lucide-react';
 import Header from '@/components/sections/header';
 import Footer from '@/components/sections/footer';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/contexts/cart-context';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import ProductStripSection from '@/components/sections/shop/product-strip-section';
+import ProductReviews from '@/components/sections/shop/product-reviews';
+import StarRating from '@/components/ui/star-rating';
 
 interface PackingType {
     _id?: string;
@@ -51,8 +55,10 @@ const ProductDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [isZoomed, setIsZoomed] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const imageContainerRef = useRef<HTMLDivElement>(null);
-    const { addToCart } = useCart();
+    const { itemCount, addToCart } = useCart();
     const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const { trackProduct, getRecentItems } = useRecentlyViewed();
+    const [allProducts, setAllProducts] = useState<any[]>([]);
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!imageContainerRef.current || !isZoomed) return;
@@ -113,6 +119,29 @@ const ProductDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
         fetchProduct();
     }, [id]);
+
+    // Track this product as recently viewed once loaded
+    useEffect(() => {
+        if (!product) return;
+        trackProduct({
+            id: product._id || product.id,
+            name: product.name,
+            slug: product.id,
+            price: product.price,
+            currency: product.currency,
+            image: product.image,
+            isNew: false,
+            inStock: true,
+        });
+    }, [product]);
+
+    // Fetch all products for related + recently viewed
+    useEffect(() => {
+        fetch('/api/products')
+            .then(r => r.json())
+            .then(data => { if (data.success) setAllProducts(data.data); })
+            .catch(() => {});
+    }, []);
 
     const handleQuantityChange = (delta: number) => {
         setQuantity(Math.max(1, quantity + delta));
@@ -229,6 +258,12 @@ const ProductDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
                             <h1 className="text-[2.5rem] md:text-[3rem] font-light font-display leading-tight mb-6">
                                 {product.name}
                             </h1>
+                            
+                            {/* Short rating summary */}
+                            <div className="flex items-center gap-2 mb-6 cursor-pointer hover:opacity-70 transition-opacity" onClick={() => toggleSection('reviews')}>
+                                <StarRating rating={4.5} size={14} />
+                                <span className="text-[12px] opacity-40 font-light underline underline-offset-4">Read 24 reviews</span>
+                            </div>
 
                             {/* Volume Selector */}
                             {product.volumes && product.volumes.length > 0 && (
@@ -507,7 +542,83 @@ const ProductDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                 </div>
                             )}
                         </div>
+
+                        {/* Reviews */}
+                        <div className="border-b border-foreground/10">
+                            <button
+                                onClick={() => toggleSection('reviews')}
+                                className="w-full py-6 flex items-center justify-between text-left"
+                            >
+                                <span className="text-[20px] font-light font-display">Reviews</span>
+                                {expandedSection === 'reviews' ? (
+                                    <ChevronUp size={20} className="text-foreground/40" />
+                                ) : (
+                                    <ChevronDown size={20} className="text-foreground/40" />
+                                )}
+                            </button>
+                            {expandedSection === 'reviews' && (
+                                <div className="pb-8">
+                                    <ProductReviews productId={product._id || product.id} />
+                                </div>
+                            )}
+                        </div>
                     </div>
+
+                    {/* Related Products */}
+                    {(() => {
+                        const related = allProducts
+                            .filter(p =>
+                                (p._id || p.id) !== (product._id || product.id) &&
+                                p.category === product.category
+                            )
+                            .slice(0, 8)
+                            .map(p => ({
+                                id: p._id || p.id,
+                                name: p.name,
+                                slug: p.slug || p.id,
+                                price: p.price,
+                                currency: p.currency,
+                                image: p.image,
+                                isNew: p.isNew,
+                                inStock: p.inStock,
+                                category: p.category,
+                            }));
+                        return (
+                            <ProductStripSection
+                                title="You Might Also Like"
+                                subtitle={`More from ${product.category || 'this category'}`}
+                                products={related}
+                                viewAllHref={`/shop?category=${product.category?.toLowerCase()}`}
+                            />
+                        );
+                    })()}
+
+                    {/* Recently Viewed */}
+                    {(() => {
+                        const currentId = product._id || product.id;
+                        const recent = getRecentItems(currentId)
+                            .map(rv => {
+                                const full = allProducts.find(p => (p._id || p.id) === rv.id);
+                                return full ? {
+                                    id: full._id || full.id,
+                                    name: full.name,
+                                    slug: full.slug || full.id,
+                                    price: full.price,
+                                    currency: full.currency,
+                                    image: full.image,
+                                    isNew: full.isNew,
+                                    inStock: full.inStock,
+                                    category: full.category,
+                                } : rv;
+                            });
+                        return (
+                            <ProductStripSection
+                                title="Recently Viewed"
+                                subtitle="Products you've looked at"
+                                products={recent}
+                            />
+                        );
+                    })()}
                 </div>
             </main>
 

@@ -3,16 +3,20 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, ShoppingCart, ChevronRight, ArrowRight } from "lucide-react";
+import { Search, ShoppingCart, ChevronRight, ArrowRight, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/cart-context";
 import { useAuth } from "@/contexts/auth-context";
+import { useWishlist } from "@/contexts/wishlist-context";
+import SearchOverlay from "./shop/search-overlay";
 
 const Header = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
-    const { itemCount } = useCart();
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const { itemCount, setIsCartOpen } = useCart();
     const { user } = useAuth();
+    const { itemCount: wishlistCount, setIsOpen: setWishlistOpen } = useWishlist();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -43,13 +47,14 @@ const Header = () => {
     ];
 
     return (
-        <header
-            className={cn(
-                "fixed top-0 left-0 w-full z-[100] transition-all duration-500 ease-in-out",
-                isScrolled || activeMenu ? "bg-background/90 backdrop-blur-xl border-b border-foreground/10" : "bg-transparent"
-            )}
-            onMouseLeave={() => setActiveMenu(null)}
-        >
+        <>
+            <header
+                className={cn(
+                    "fixed top-0 left-0 w-full z-[100] transition-all duration-500 ease-in-out",
+                    isScrolled || activeMenu ? "bg-background/90 backdrop-blur-xl border-b border-foreground/10" : "bg-transparent"
+                )}
+                onMouseLeave={() => setActiveMenu(null)}
+            >
             <div className="container mx-auto h-[90px] flex items-center justify-between pointer-events-auto">
                 {/* Logo */}
                 <Link href="/" className="relative z-[101] flex items-center gap-3 group">
@@ -103,13 +108,34 @@ const Header = () => {
                 </nav>
 
                 {/* Right Actions */}
-                <div className="flex items-center gap-4">
-                    <button className={cn("transition-colors", "text-foreground hover:text-brand-green")}>
+                <div className="flex items-center gap-3">
+                    <button 
+                        onClick={() => setIsSearchOpen(true)}
+                        className={cn("transition-colors", "text-foreground hover:text-brand-green")}
+                        aria-label="Search"
+                    >
                         <Search size={20} strokeWidth={1.5} />
                     </button>
 
-                    <Link
-                        href="/cart"
+                    {/* Wishlist */}
+                    <button
+                        onClick={() => setWishlistOpen(true)}
+                        className={cn(
+                            "transition-all relative p-2.5 rounded-md border hover:border-foreground/30",
+                            "text-foreground hover:text-brand-green",
+                            "border-foreground/10"
+                        )}
+                        aria-label="Open wishlist"
+                    >
+                        <Heart size={20} strokeWidth={1.5} />
+                        {wishlistCount > 0 && (
+                            <span className="absolute -top-1.5 -right-2 text-[10px] font-bold px-1.5 rounded-full min-w-[16px] h-4 flex items-center justify-center bg-foreground text-background animate-in zoom-in duration-200">
+                                {wishlistCount > 99 ? '99+' : wishlistCount}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setIsCartOpen(true)}
                         className={cn(
                             "transition-all relative p-2.5 rounded-md border hover:border-foreground/30",
                             "text-foreground hover:text-brand-green",
@@ -125,15 +151,16 @@ const Header = () => {
                                 {itemCount > 99 ? '99+' : itemCount}
                             </span>
                         )}
-                    </Link>
+                    </button>
 
                     <Link
-                        href="/login"
+                        href={user ? "/dashboard" : "/login"}
                         className={cn(
                             "transition-all p-2.5 rounded-md border hover:border-foreground/30",
                             "text-foreground hover:text-brand-green",
                             "border-foreground/10"
                         )}
+                        aria-label={user ? "Go to Dashboard" : "Login"}
                     >
                         <svg
                             width="20"
@@ -260,7 +287,10 @@ const Header = () => {
                 </div>
             </div>
         </header>
-    );
+
+        <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+    </>
+);
 };
 
 export default Header;

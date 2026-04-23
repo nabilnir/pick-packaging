@@ -31,6 +31,8 @@ interface CartContextType {
     showToast: boolean;
     toastItem: CartItem | null;
     hideToast: () => void;
+    isCartOpen: boolean;
+    setIsCartOpen: (isOpen: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -41,6 +43,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const [items, setItems] = useState<CartItem[]>([]);
     const [showToast, setShowToast] = useState(false);
     const [toastItem, setToastItem] = useState<CartItem | null>(null);
+    const [isCartOpen, setIsCartOpen] = useState(false);
     const { user } = useAuth();
     const router = useRouter();
 
@@ -98,14 +101,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             }
         });
 
-        // Show toast
-        setToastItem({ ...item, id });
+        // Open mini cart drawer
+        setIsCartOpen(true);
+        // Also fire toast for instant confirmation
+        const newId = `${item.productId}-${item.packingType.name}-${item.volume || 'default'}`;
+        setToastItem({ ...item, id: newId });
         setShowToast(true);
-
-        // Auto-hide toast after 5 seconds
-        setTimeout(() => {
-            setShowToast(false);
-        }, 5000);
+        setTimeout(() => setShowToast(false), 4000);
 
         return true;
     }, [user, router]);
@@ -145,7 +147,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             clearCart,
             showToast,
             toastItem,
-            hideToast
+            hideToast,
+            isCartOpen,
+            setIsCartOpen
         }}>
             {children}
         </CartContext.Provider>

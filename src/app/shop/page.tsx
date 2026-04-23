@@ -2,6 +2,7 @@ import React from 'react';
 import Header from '@/components/sections/header';
 import Footer from '@/components/sections/footer';
 import ShopGrid from '@/components/sections/shop/shop-grid';
+import RecentlyViewedShop from '@/components/sections/shop/recently-viewed-shop';
 
 export const metadata = {
     title: 'Shop | Yucca Packaging',
@@ -14,6 +15,7 @@ const ShopPage = () => {
             <Header />
             <main className="flex-grow">
                 <ShopGrid />
+                <RecentlyViewedShop />
             </main>
             <Footer />
         </div>

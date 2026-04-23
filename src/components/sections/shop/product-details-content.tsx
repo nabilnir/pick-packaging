@@ -3,9 +3,10 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { SearchIcon, ZoomIn } from 'lucide-react';
+import { ZoomIn } from 'lucide-react';
 import ProductOptions from './product-options';
 import ProductInfoAccordion from './product-info-accordion';
+import WishlistButton from '@/components/ui/wishlist-button';
 
 interface ProductDetailsContentProps {
     product: any;
@@ -43,11 +44,31 @@ const ProductDetailsContent = ({ product }: ProductDetailsContentProps) => {
 
                     {/* Right: Product Details */}
                     <div className="flex flex-col">
-                        <h1 className="text-[3.5rem] md:text-[4.5rem] font-light leading-tight mb-8 font-display">
-                            {product.name}
-                        </h1>
-
+                        {/* Title + wishlist row */}
+                        <div className="flex items-start justify-between gap-4 mb-8">
+                            <h1 className="text-[3.5rem] md:text-[4.5rem] font-light leading-tight font-display">
+                                {product.name}
+                            </h1>
+                            <div className="mt-4 shrink-0">
+                                <WishlistButton
+                                    product={{
+                                        id: product._id || product.id,
+                                        name: product.name,
+                                        slug: product.slug,
+                                        image: product.image,
+                                        price: product.price,
+                                        currency: product.currency,
+                                        isNew: product.isNew,
+                                    }}
+                                    size={18}
+                                    className="w-11 h-11"
+                                />
+                            </div>
+                        </div>
                         <ProductOptions
+                            productId={product._id || product.id}
+                            name={product.name}
+                            image={product.image}
                             basePrice={product.price}
                             currency={product.currency}
                             volumes={product.volumes || []}

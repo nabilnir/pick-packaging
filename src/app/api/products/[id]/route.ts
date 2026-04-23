@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import dbConnect from '@/lib/db';
 import Product from '@/models/Product';
 
@@ -9,7 +10,16 @@ export async function GET(
     try {
         await dbConnect();
         const { id } = await params;
-        const product = await Product.findOne({ id });
+        
+        let product;
+        
+        // Try to find by custom 'id' first
+        product = await Product.findOne({ id });
+        
+        // If not found and it looks like a MongoDB ObjectId, try find by _id
+        if (!product && mongoose.Types.ObjectId.isValid(id)) {
+            product = await Product.findById(id);
+        }
 
         if (!product) {
             return NextResponse.json(

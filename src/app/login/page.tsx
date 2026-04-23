@@ -13,9 +13,15 @@ import { Suspense } from 'react';
 const LoginForm = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { login, loginWithGoogle } = useAuth();
+    const { user, login, loginWithGoogle } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+
+    React.useEffect(() => {
+        if (user) {
+            router.push('/dashboard');
+        }
+    }, [user, router]);
     const [formData, setFormData] = useState({
         email: '',
         password: '',

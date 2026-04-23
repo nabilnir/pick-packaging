@@ -5,7 +5,10 @@ import SmoothScroll from "@/components/smooth-scroll";
 import Script from "next/script";
 import { AuthProvider } from "@/contexts/auth-context";
 import { CartProvider } from "@/contexts/cart-context";
-import CartToast from "@/components/ui/cart-toast";
+import { WishlistProvider } from "@/contexts/wishlist-context";
+import { ToastProvider } from "@/components/ui/toast-provider";
+import MiniCart from "@/components/cart/mini-cart";
+import WishlistDrawer from "@/components/cart/wishlist-drawer";
 
 export const metadata: Metadata = {
   title: "PickPacking | Premium Industrial Packaging",
@@ -22,7 +25,8 @@ export default function RootLayout({
       <body className="antialiased">
         <AuthProvider>
           <CartProvider>
-            <SmoothScroll>
+            <WishlistProvider>
+              <SmoothScroll>
               <Script
                 id="orchids-browser-logs"
                 src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/scripts/orchids-browser-logs.js"
@@ -40,11 +44,15 @@ export default function RootLayout({
                 data-debug="true"
                 data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
               />
-              {children}
-              <CartToast />
+              <ToastProvider>
+                {children}
+                <MiniCart />
+                <WishlistDrawer />
+              </ToastProvider>
             </SmoothScroll>
-          </CartProvider>
-        </AuthProvider>
+          </WishlistProvider>
+        </CartProvider>
+      </AuthProvider>
       </body>
     </html>
   );

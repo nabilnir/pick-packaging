@@ -269,6 +269,47 @@
     text-wrap: balance;
   }
 
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(18, 39, 29, 0.15) transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(18, 39, 29, 0.15);
+    border-radius: 2px;
+  }
+
+  /* Price range slider — hide native thumbs so CSS ones show */
+  .price-range-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    pointer-events: all;
+  }
+  .price-range-thumb::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+  .price-range-thumb::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
   .marquee-container {
     display: flex;
     overflow: hidden;

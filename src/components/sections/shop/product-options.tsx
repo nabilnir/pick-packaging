@@ -2,8 +2,11 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Minus, Plus } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
+import { useCart } from '@/contexts/cart-context';
+import { useAuth } from '@/contexts/auth-context';
+import { useToast } from '@/components/ui/toast-provider';
 
 interface PackingType {
     name: string;
@@ -12,18 +15,47 @@ interface PackingType {
 }
 
 interface ProductOptionsProps {
+    productId: string;
+    name: string;
+    image: string;
     basePrice: number;
     currency: string;
     volumes: string[];
     packingTypes: PackingType[];
 }
 
-const ProductOptions = ({ basePrice, currency, volumes, packingTypes }: ProductOptionsProps) => {
-    const [selectedVolume, setSelectedVolume] = useState(volumes[0]);
+const ProductOptions = ({ productId, name, image, basePrice, currency, volumes, packingTypes }: ProductOptionsProps) => {
+    const [selectedVolume, setSelectedVolume]   = useState(volumes[0] ?? '');
     const [selectedPacking, setSelectedPacking] = useState(packingTypes[0]);
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity]               = useState(1);
+    const [justAdded, setJustAdded]             = useState(false);
 
-    const totalPrice = (basePrice * selectedPacking.priceMultiplier * selectedPacking.units * quantity);
+    const { addToCart } = useCart();
+    const { user } = useAuth();
+    const { cartToast } = useToast();
+
+    const totalPrice = basePrice * (selectedPacking?.priceMultiplier ?? 1) * (selectedPacking?.units ?? 1) * quantity;
+
+    const handleAddToCart = () => {
+        if (!selectedPacking) return;
+
+        const success = addToCart({
+            productId,
+            name,
+            image,
+            price: basePrice,
+            currency,
+            packingType: selectedPacking,
+            volume: selectedVolume || undefined,
+            quantity,
+        });
+
+        if (success) {
+            cartToast(name, image);
+            setJustAdded(true);
+            setTimeout(() => setJustAdded(false), 2000);
+        }
+    };
 
     return (
         <div className="space-y-10">
@@ -62,7 +94,7 @@ const ProductOptions = ({ basePrice, currency, volumes, packingTypes }: ProductO
                                 onClick={() => setSelectedPacking(p)}
                                 className={cn(
                                     "px-6 py-5 rounded-[4px] border text-[14px] transition-all flex justify-between items-center",
-                                    selectedPacking.name === p.name
+                                    selectedPacking?.name === p.name
                                         ? "bg-[#F5F5F0] border-foreground/20 text-foreground"
                                         : "border-foreground/5 text-foreground/40 hover:border-foreground/20"
                                 )}
@@ -110,8 +142,27 @@ const ProductOptions = ({ basePrice, currency, volumes, packingTypes }: ProductO
             </div>
 
             {/* Add to Cart */}
-            <button className="w-full bg-foreground text-background py-6 rounded-[4px] font-medium uppercase tracking-[0.2em] hover:bg-brand-green transition-all duration-500 shadow-xl shadow-foreground/5">
-                Add to cart
+            <button
+                onClick={handleAddToCart}
+                disabled={!selectedPacking}
+                className={cn(
+                    "w-full py-6 rounded-[4px] font-medium uppercase tracking-[0.2em] transition-all duration-500 shadow-xl shadow-foreground/5 flex items-center justify-center gap-3",
+                    justAdded
+                        ? "bg-brand-green text-white"
+                        : "bg-foreground text-background hover:bg-brand-green"
+                )}
+            >
+                {justAdded ? (
+                    <>
+                        <CheckCircle2 size={20} className="shrink-0" />
+                        Added to cart!
+                    </>
+                ) : (
+                    <>
+                        <ShoppingBag size={20} className="shrink-0" />
+                        {user ? 'Add to cart' : 'Sign in to add to cart'}
+                    </>
+                )}
             </button>
 
             {/* Shipping Info */}
