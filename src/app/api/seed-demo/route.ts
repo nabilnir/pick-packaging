@@ -42,12 +42,12 @@ export async function GET() {
                     productId: demoProduct._id,
                     name: demoProduct.name,
                     image: demoProduct.image,
-                    price: demoProduct.price,
+                    price: demoProduct.price || 0,
                     quantity: Math.floor(Math.random() * 5) + 1,
                     packingType: demoProduct.packingTypes[0],
                     volume: "100ml"
                 }],
-                totalAmount: demoProduct.price * 2,
+                totalAmount: (demoProduct.price || 0) * 2,
                 status: statuses[i % statuses.length],
                 paymentStatus: i % 2 === 0 ? 'Paid' : 'Unpaid',
                 shippingAddress: {

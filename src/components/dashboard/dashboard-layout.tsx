@@ -31,10 +31,23 @@ interface DashboardLayoutProps {
     title: string;
 }
 
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 export default function DashboardLayout({ children, items, title }: DashboardLayoutProps) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const pathname = usePathname();
-    const { user, logout } = useAuth();
+    const { user, logout, loading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push('/login');
+        }
+    }, [user, loading, router]);
+
+    if (loading) return <div className="h-screen bg-[#F9F9F7] flex items-center justify-center italic opacity-20 transition-opacity">Loading secure session...</div>;
+    if (!user) return null; // Prevent flicker before redirect
 
     return (
         <div className="flex h-screen bg-[#F9F9F7]">

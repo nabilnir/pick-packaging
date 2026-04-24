@@ -16,22 +16,28 @@ import {
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
-const USER_NAV = [
-    { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-    { label: "My Orders", href: "/dashboard/orders", icon: ShoppingBag },
-    { label: "Wishlist", href: "/dashboard/wishlist", icon: Heart },
-    { label: "Addresses", href: "/dashboard/addresses", icon: MapPin },
-    { label: "Settings", href: "/dashboard/settings", icon: User },
-];
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/auth-context';
+import { useEffect } from 'react';
 
 export default function UserDashboard() {
+    const { user } = useAuth();
+    
+    const USER_NAV = [
+        { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+        { label: "My Orders", href: "/dashboard/orders", icon: ShoppingBag },
+        { label: "Wishlist", href: "/dashboard/wishlist", icon: Heart },
+        { label: "Addresses", href: "/dashboard/addresses", icon: MapPin },
+        { label: "Settings", href: "/dashboard/settings", icon: User },
+    ];
+
     return (
         <DashboardLayout items={USER_NAV} title="Account Dashboard">
             <div className="max-w-6xl">
                 {/* Welcome Message */}
                 <div className="mb-12">
-                    <h2 className="text-[2.5rem] font-light font-display leading-tight mb-2">Hello, Sarah</h2>
-                    <p className="text-foreground/40 font-light text-[1.1rem]">Welcome back to your Yucca account. Here's what's happening today.</p>
+                    <h2 className="text-[2.5rem] font-light font-display leading-tight mb-2">Hello, {user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}</h2>
+                    <p className="text-foreground/40 font-light text-[1.1rem]">Welcome back to your PickPacking account. Here's what's happening today.</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">

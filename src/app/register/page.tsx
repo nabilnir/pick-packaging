@@ -33,7 +33,7 @@ const RegisterPage = () => {
 
         try {
             await register(formData.email, formData.password);
-            router.push('/shop');
+            router.push('/dashboard');
         } catch (err: any) {
             setError(err.message || 'Failed to register. Please try again.');
         } finally {
@@ -47,7 +47,7 @@ const RegisterPage = () => {
 
         try {
             await loginWithGoogle();
-            router.push('/shop');
+            router.push('/dashboard');
         } catch (err: any) {
             setError(err.message || 'Failed to register with Google.');
         } finally {

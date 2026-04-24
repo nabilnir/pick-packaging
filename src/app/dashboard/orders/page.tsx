@@ -2,17 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/dashboard/dashboard-layout';
-import { ShoppingBag, ChevronRight, Package, Truck, CheckCircle2, Search, Filter } from 'lucide-react';
+import { ShoppingBag, ChevronRight, Package, Truck, CheckCircle2, Search, Filter, LayoutDashboard, Heart, MapPin, User } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-    LayoutDashboard, 
-    Heart, 
-    MapPin, 
-    User
-} from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const USER_NAV = [
     { label: "Overview", href: "/dashboard", icon: LayoutDashboard },

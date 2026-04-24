@@ -28,7 +28,7 @@ const LoginForm = () => {
         rememberMe: false
     });
 
-    const redirectPath = searchParams.get('redirect') || '/shop';
+    const redirectPath = searchParams.get('redirect') || '/dashboard';
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
