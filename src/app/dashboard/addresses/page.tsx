@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/dashboard/dashboard-layout';
-import { ShoppingBag, Heart, MapPin, User, LayoutDashboard, Plus, Edit3, Trash2, X } from 'lucide-react';
+import { ShoppingBag, Heart, MapPin, User, LayoutDashboard, Plus, Edit3, Trash2, X, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/auth-context';
+import Swal from 'sweetalert2';
 
 const USER_NAV = [
     { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
@@ -13,7 +15,8 @@ const USER_NAV = [
 ];
 
 interface Address {
-    id: string;
+    _id: string;
+    userEmail: string;
     locationName: string;
     fullName: string;
     phone: string;
@@ -23,79 +26,85 @@ interface Address {
     isPrimary: boolean;
 }
 
-import Swal from 'sweetalert2';
-
 export default function AddressesPage() {
+    const { user } = useAuth();
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [addresses, setAddresses] = useState<Address[]>([
-        {
-            id: '1',
-            locationName: 'Office Location',
-            fullName: 'Ragnar Rickens',
-            phone: '',
-            street: '123 Industrial Way',
-            city: 'Woodstock, Cape Town',
-            postalCode: '8001',
-            isPrimary: true,
-        },
-        {
-            id: '2',
-            locationName: 'Home',
-            fullName: 'Ragnar Rickens',
-            phone: '',
-            street: '45 Ocean View Drive',
-            city: 'Camps Bay, Cape Town',
-            postalCode: '8005',
-            isPrimary: false,
-        }
-    ]);
+    const [addresses, setAddresses] = useState<Address[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
     
     const [formData, setFormData] = useState<Partial<Address>>({
         isPrimary: false
     });
 
+    useEffect(() => {
+        if (user?.email) {
+            fetchAddresses();
+        }
+    }, [user]);
+
+    const fetchAddresses = async () => {
+        try {
+            setLoading(true);
+            const res = await fetch(`/api/addresses?email=${user?.email}`);
+            const data = await res.json();
+            if (data.success) {
+                setAddresses(data.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch addresses", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const openAddModal = () => {
-        setFormData({ isPrimary: false });
+        setFormData({ isPrimary: false, userEmail: user?.email || '' });
         setEditingId(null);
         setIsAddModalOpen(true);
     };
 
     const openEditModal = (address: Address) => {
         setFormData(address);
-        setEditingId(address.id);
+        setEditingId(address._id);
         setIsAddModalOpen(true);
     };
 
-    const handleSave = () => {
-        const addressData: Address = {
-            id: editingId || Math.random().toString(36).substring(2, 9),
-            locationName: formData.locationName || 'New Location',
-            fullName: formData.fullName || '',
-            phone: formData.phone || '',
-            street: formData.street || '',
-            city: formData.city || '',
-            postalCode: formData.postalCode || '',
-            isPrimary: formData.isPrimary || false,
+    const handleSave = async () => {
+        if (!user?.email) return;
+        setSaving(true);
+
+        const payload = {
+            ...formData,
+            userEmail: user.email,
         };
 
-        if (addressData.isPrimary) {
-            if (editingId) {
-                setAddresses(prev => prev.map(a => a.id === editingId ? addressData : { ...a, isPrimary: false }));
+        try {
+            const method = editingId ? 'PUT' : 'POST';
+            if (editingId) payload._id = editingId;
+
+            const res = await fetch('/api/addresses', {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                await fetchAddresses();
+                setIsAddModalOpen(false);
+                setEditingId(null);
+                setFormData({ isPrimary: false });
             } else {
-                setAddresses(prev => prev.map(a => ({ ...a, isPrimary: false })).concat(addressData));
+                Swal.fire('Error', data.error || 'Failed to save address', 'error');
             }
-        } else {
-            if (editingId) {
-                setAddresses(prev => prev.map(a => a.id === editingId ? addressData : a));
-            } else {
-                setAddresses(prev => [...prev, addressData]);
-            }
+        } catch (error: any) {
+            Swal.fire('Error', error.message || 'Something went wrong', 'error');
+        } finally {
+            setSaving(false);
         }
-        
-        setIsAddModalOpen(false);
-        setEditingId(null);
-        setFormData({ isPrimary: false });
     };
 
     const handleDelete = (id: string) => {
@@ -107,15 +116,26 @@ export default function AddressesPage() {
             confirmButtonColor: '#2ECC71',
             cancelButtonColor: '#E74C3C',
             confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                setAddresses(prev => prev.filter(a => a.id !== id));
-                Swal.fire({
-                    title: 'Deleted!',
-                    text: 'Your address has been removed.',
-                    icon: 'success',
-                    confirmButtonColor: '#2ECC71'
-                });
+                try {
+                    const res = await fetch(`/api/addresses?id=${id}`, { method: 'DELETE' });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        setAddresses(prev => prev.filter(a => a._id !== id));
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Your address has been removed.',
+                            icon: 'success',
+                            confirmButtonColor: '#2ECC71'
+                        });
+                    } else {
+                        throw new Error(data.error);
+                    }
+                } catch (error: any) {
+                    Swal.fire('Error', error.message || 'Failed to delete', 'error');
+                }
             }
         });
     };
@@ -137,28 +157,46 @@ export default function AddressesPage() {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {addresses.map((address) => (
-                        <div key={address.id} className={`bg-background rounded-2xl border p-8 relative transition-all ${address.isPrimary ? 'border-brand-green/30' : 'border-foreground/5 hover:border-foreground/10'}`}>
-                            <div className="absolute top-6 right-6 flex gap-2">
-                                <button onClick={() => openEditModal(address)} className="p-2 hover:bg-foreground/5 rounded-lg transition-all opacity-40 hover:opacity-100"><Edit3 size={16} /></button>
-                                <button onClick={() => handleDelete(address.id)} className="p-2 hover:bg-red-50 hover:text-red-500 rounded-lg transition-all opacity-40 hover:opacity-100"><Trash2 size={16} /></button>
+                {loading ? (
+                    <div className="py-20 flex flex-col items-center justify-center opacity-40">
+                        <Loader2 className="animate-spin mb-4" size={32} />
+                        <p className="italic text-[14px]">Loading addresses...</p>
+                    </div>
+                ) : addresses.length === 0 ? (
+                    <div className="py-20 text-center rounded-2xl border border-dashed border-foreground/10 bg-foreground/[0.01]">
+                        <MapPin className="mx-auto opacity-20 mb-4" size={48} />
+                        <p className="opacity-60 text-[15px] mb-6">You haven't saved any addresses yet.</p>
+                        <button 
+                            onClick={openAddModal}
+                            className="inline-flex items-center gap-2 text-brand-green font-bold uppercase tracking-widest text-[12px] hover:opacity-80 transition-opacity"
+                        >
+                            Add Your First Address
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {addresses.map((address) => (
+                            <div key={address._id} className={`bg-background rounded-2xl border p-8 relative transition-all ${address.isPrimary ? 'border-brand-green/30' : 'border-foreground/5 hover:border-foreground/10'}`}>
+                                <div className="absolute top-6 right-6 flex gap-2">
+                                    <button onClick={() => openEditModal(address)} className="p-2 hover:bg-foreground/5 rounded-lg transition-all opacity-40 hover:opacity-100"><Edit3 size={16} /></button>
+                                    <button onClick={() => handleDelete(address._id)} className="p-2 hover:bg-red-50 hover:text-red-500 rounded-lg transition-all opacity-40 hover:opacity-100"><Trash2 size={16} /></button>
+                                </div>
+                                <div className={`flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest mb-6 ${address.isPrimary ? 'text-brand-green' : 'text-foreground/20'}`}>
+                                    {address.isPrimary && <div className="w-1.5 h-1.5 rounded-full bg-brand-green" />}
+                                    {address.isPrimary ? 'Primary Shipping' : address.locationName || 'Residential'}
+                                </div>
+                                <h4 className="text-[1.25rem] font-medium mb-1">{address.locationName}</h4>
+                                <p className="text-[15px] font-medium text-foreground mb-1">{address.fullName}</p>
+                                <p className="text-[14px] opacity-40 font-light leading-relaxed">
+                                    {address.street}<br />
+                                    {address.city} {address.postalCode}<br />
+                                    {address.phone && <>{address.phone}<br/></>}
+                                    South Africa
+                                </p>
                             </div>
-                            <div className={`flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest mb-6 ${address.isPrimary ? 'text-brand-green' : 'text-foreground/20'}`}>
-                                {address.isPrimary && <div className="w-1.5 h-1.5 rounded-full bg-brand-green" />}
-                                {address.isPrimary ? 'Primary Shipping' : address.locationName || 'Residential'}
-                            </div>
-                            <h4 className="text-[1.25rem] font-medium mb-1">{address.locationName}</h4>
-                            <p className="text-[15px] font-medium text-foreground mb-1">{address.fullName}</p>
-                            <p className="text-[14px] opacity-40 font-light leading-relaxed">
-                                {address.street}<br />
-                                {address.city} {address.postalCode}<br />
-                                {address.phone && <>{address.phone}<br/></>}
-                                South Africa
-                            </p>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Add/Edit Address Modal */}
@@ -258,14 +296,17 @@ export default function AddressesPage() {
                         <div className="p-6 border-t border-foreground/5 bg-foreground/[0.02] flex justify-end gap-3 shrink-0">
                             <button 
                                 onClick={() => setIsAddModalOpen(false)}
-                                className="px-6 py-3 rounded-full text-[12px] font-bold uppercase tracking-widest hover:bg-foreground/5 transition-all text-foreground/60"
+                                disabled={saving}
+                                className="px-6 py-3 rounded-full text-[12px] font-bold uppercase tracking-widest hover:bg-foreground/5 transition-all text-foreground/60 disabled:opacity-50"
                             >
                                 Cancel
                             </button>
                             <button 
-                                className="px-6 py-3 bg-foreground text-background rounded-full text-[12px] font-bold uppercase tracking-widest hover:bg-brand-green transition-all"
+                                className="flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-full text-[12px] font-bold uppercase tracking-widest hover:bg-brand-green transition-all disabled:opacity-50"
                                 onClick={handleSave}
+                                disabled={saving}
                             >
+                                {saving ? <Loader2 className="animate-spin" size={14} /> : null}
                                 {editingId ? 'Update Address' : 'Save Address'}
                             </button>
                         </div>
