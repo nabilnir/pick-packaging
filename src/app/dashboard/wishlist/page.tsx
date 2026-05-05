@@ -19,7 +19,7 @@ const USER_NAV = [
 ];
 
 export default function WishlistPage() {
-    const { items, removeItem } = useWishlist();
+    const { items, removeFromWishlist } = useWishlist();
     const { addToCart } = useCart();
     const { success } = useToast();
 
@@ -65,7 +65,7 @@ export default function WishlistPage() {
                                             Add to Cart
                                         </button>
                                         <button 
-                                            onClick={() => removeItem(item._id)}
+                                            onClick={() => removeFromWishlist(item._id)}
                                             className="p-3 border border-foreground/5 rounded-xl hover:bg-red-50 hover:text-red-500 transition-all group/trash"
                                             title="Remove Item"
                                         >

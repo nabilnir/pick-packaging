@@ -12,18 +12,20 @@ import {
     Users, 
     BarChart3, 
     Settings,
+    Factory,
     Edit3
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/toast-provider';
 
 const ADMIN_NAV = [
-    { label: "Overview", href: "/admin", icon: LayoutDashboard },
-    { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
-    { label: "Products", href: "/admin/products", icon: Package },
-    { label: "Customers", href: "/admin/customers", icon: Users },
-    { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-    { label: "Settings", href: "/admin/settings", icon: Settings },
+    { label: "Overview",  href: "/admin",          icon: LayoutDashboard },
+    { label: "Orders",    href: "/admin/orders",    icon: ShoppingBag     },
+    { label: "Products",  href: "/admin/products",  icon: Package         },
+    { label: "Customers", href: "/admin/customers", icon: Users           },
+    { label: "Analytics", href: "/admin/analytics", icon: BarChart3       },
+    { label: "Vendors",   href: "/admin/vendors",   icon: Factory         },
+    { label: "Settings",  href: "/admin/settings",  icon: Settings        },
 ];
 
 export default function AdminOrders() {
