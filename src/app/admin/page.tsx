@@ -11,6 +11,9 @@ import {
     BarChart3,
     Settings,
     Factory,
+    TrendingUp,
+    TrendingDown,
+    ArrowUpRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -24,143 +27,108 @@ const ADMIN_NAV = [
     { label: "Settings",  href: "/admin/settings",  icon: Settings        },
 ];
 
-// ─── KPI data ──────────────────────────────────────────────────────────────
+// ── KPI data ───────────────────────────────────────────────────────────────
 const KPI_CARDS = [
-    {
-        label: "Total Revenue",
-        value: "$2.48M",
-        meta: "+12.4% VS LAST MONTH",
-        metaType: "up" as const,
-    },
-    {
-        label: "Active Vendors",
-        value: "142",
-        meta: "STABLE",
-        metaType: "neutral" as const,
-    },
-    {
-        label: "Total SKUs",
-        value: "18,402",
-        meta: "+450 THIS WEEK",
-        metaType: "up" as const,
-        accent: true,
-    },
-    {
-        label: "Pending Orders",
-        value: "34",
-        meta: "REQUIRES ACTION",
-        metaType: "error" as const,
-    },
+    { label: "Total Revenue",    value: "$2.48M",  change: "+12.4%", trend: "up"      as const, info: "vs last month"  },
+    { label: "Active Vendors",   value: "142",     change: "Stable", trend: "neutral" as const, info: ""               },
+    { label: "Total SKUs",       value: "18,402",  change: "+450",   trend: "up"      as const, info: "this week"      },
+    { label: "Pending Orders",   value: "34",      change: "Action", trend: "error"   as const, info: "requires review" },
 ];
 
-// ─── Vendor bars ───────────────────────────────────────────────────────────
+// ── Vendor bars ────────────────────────────────────────────────────────────
 const VENDORS = [
-    { id: "VND-01", pct: 80,  label: "92.4%", active: false },
-    { id: "VND-02", pct: 65,  label: "74.1%", active: false },
-    { id: "VND-03", pct: 95,  label: "98.9%", active: true  },
-    { id: "VND-04", pct: 45,  label: "52.0%", active: false },
-    { id: "VND-05", pct: 78,  label: "89.5%", active: false },
+    { id: "VND-01", pct: 80, label: "92.4%", active: false },
+    { id: "VND-02", pct: 65, label: "74.1%", active: false },
+    { id: "VND-03", pct: 95, label: "98.9%", active: true  },
+    { id: "VND-04", pct: 45, label: "52.0%", active: false },
+    { id: "VND-05", pct: 78, label: "89.5%", active: false },
 ];
 
-// ─── Activity log ──────────────────────────────────────────────────────────
+// ── Activity log ───────────────────────────────────────────────────────────
 const ACTIVITY = [
-    {
-        tag: "ORDER",
-        tagStyle: "bg-stone-100 text-stone-600 border-stone-300",
-        time: "Just Now",
-        msg: "PO-2023-8942 Approved by System Admin.",
-    },
-    {
-        tag: "INVENTORY",
-        tagStyle: "bg-stone-900 text-white border-stone-900",
-        time: "2m ago",
-        msg: "New SKU (PKG-C-092) Uploaded via API batch.",
-    },
-    {
-        tag: "ALERT",
-        tagStyle: "bg-red-50 text-red-700 border-red-300",
-        time: "15m ago",
-        msg: "Vendor VND-04 SLA violation detected. Auto-routing triggered.",
-    },
-    {
-        tag: "SYSTEM",
-        tagStyle: "bg-stone-100 text-stone-600 border-stone-300",
-        time: "1h ago",
-        msg: "Daily backup completed successfully.",
-    },
+    { tag: "ORDER",     tagStyle: "bg-foreground/5 text-foreground/60",         time: "Just now", msg: "PO-2023-8942 approved by System Admin."               },
+    { tag: "INVENTORY", tagStyle: "bg-foreground text-background",              time: "2m ago",   msg: "New SKU (PKG-C-092) uploaded via API batch."           },
+    { tag: "ALERT",     tagStyle: "bg-red-50 text-red-600",                     time: "15m ago",  msg: "Vendor VND-04 SLA violation — auto-routing triggered." },
+    { tag: "SYSTEM",    tagStyle: "bg-foreground/5 text-foreground/60",         time: "1h ago",   msg: "Daily backup completed successfully."                  },
 ];
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════
 export default function AdminOverview() {
     return (
         <DashboardLayout items={ADMIN_NAV} title="Administrator">
 
-            {/* ── Page Header ─────────────────────────────────────────────── */}
-            <div className="mb-10 flex justify-between items-end border-b border-stone-200 pb-5">
+            {/* ── Page header ─────────────────────────────────────────── */}
+            <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-foreground/[0.07]">
                 <div>
-                    <h1 className="text-4xl font-black tracking-tighter uppercase text-stone-900">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-foreground/40 mb-1">
+                        Admin Panel
+                    </p>
+                    <h1 className="font-display text-[2.2rem] font-light text-foreground tracking-tight">
                         Overview
                     </h1>
-                    <p className="text-sm text-stone-500 mt-1 max-w-xl">
-                        Central command center for platform administrators. Real-time metrics and system health indicators.
+                    <p className="text-[14px] font-light text-foreground/50 mt-1 max-w-xl">
+                        Central command for platform administrators. Real-time metrics and system health.
                     </p>
                 </div>
-                <button className="bg-stone-900 text-white text-[11px] font-bold uppercase tracking-widest px-5 py-2.5 hover:bg-stone-700 transition-colors border border-stone-900">
+                <button className="shrink-0 text-[11px] font-medium uppercase tracking-[0.15em] px-6 py-2.5 bg-foreground text-background rounded-xl hover:bg-foreground/80 transition-colors">
                     Generate Report
                 </button>
             </div>
 
-            {/* ── KPI Cards ───────────────────────────────────────────────── */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                {KPI_CARDS.map((card) => (
+            {/* ── KPI Cards ───────────────────────────────────────────── */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                {KPI_CARDS.map(card => (
                     <KpiCard key={card.label} {...card} />
                 ))}
             </div>
 
-            {/* ── Main Grid ───────────────────────────────────────────────── */}
+            {/* ── Main grid ───────────────────────────────────────────── */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                {/* Vendor Performance Matrix */}
-                <div className="lg:col-span-8 border border-stone-200 bg-white flex flex-col">
-                    <div className="px-6 py-4 border-b border-stone-200 flex justify-between items-center bg-stone-50">
-                        <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-900">
-                            Vendor Performance Matrix
-                        </h3>
-                        <button className="text-stone-400 hover:text-stone-700 transition-colors text-xl leading-none">
-                            ···
-                        </button>
+                {/* Vendor Performance (8 cols) */}
+                <div className="lg:col-span-8 bg-background rounded-2xl border border-foreground/[0.07] flex flex-col overflow-hidden">
+                    <div className="px-6 py-4 border-b border-foreground/[0.06] flex justify-between items-center">
+                        <div>
+                            <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-foreground/40">
+                                Performance Matrix
+                            </p>
+                            <h3 className="font-display text-[1rem] font-light text-foreground mt-0.5">
+                                Vendor On-Time Delivery
+                            </h3>
+                        </div>
+                        <button className="text-foreground/30 hover:text-foreground transition-colors text-xl leading-none">···</button>
                     </div>
 
-                    <div className="p-8 flex-1 flex flex-col justify-end gap-6 relative">
-                        {/* Grid lines */}
-                        <div className="absolute inset-x-8 top-8 bottom-20 flex flex-col justify-between pointer-events-none">
+                    <div className="p-8 flex-1 flex flex-col justify-end relative">
+                        {/* Horizontal grid lines */}
+                        <div className="absolute inset-x-8 top-8 bottom-16 flex flex-col justify-between pointer-events-none">
                             {[...Array(5)].map((_, i) => (
-                                <div key={i} className="border-t border-stone-100 w-full" />
+                                <div key={i} className="border-t border-foreground/[0.05] w-full" />
                             ))}
                         </div>
 
                         {/* Bars */}
-                        <div className="relative flex justify-around items-end h-56 mt-4">
-                            {VENDORS.map((v) => (
-                                <div key={v.id} className="flex flex-col items-center gap-3 w-14 group">
+                        <div className="relative flex justify-around items-end h-48 mt-4">
+                            {VENDORS.map(v => (
+                                <div key={v.id} className="flex flex-col items-center gap-2 w-14 group">
                                     <div className="relative w-full" style={{ height: `${v.pct}%` }}>
                                         {/* Tooltip */}
                                         <div className={cn(
-                                            "absolute -top-8 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] font-bold px-2 py-1 whitespace-nowrap transition-opacity",
+                                            "absolute -top-7 left-1/2 -translate-x-1/2 bg-foreground text-background text-[10px] font-medium px-2 py-0.5 rounded-md whitespace-nowrap transition-opacity",
                                             v.active ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                                         )}>
                                             {v.label}
                                         </div>
                                         <div className={cn(
-                                            "w-full h-full border transition-colors",
+                                            "w-full h-full rounded-t-lg transition-colors",
                                             v.active
-                                                ? "bg-stone-900 border-stone-900"
-                                                : "bg-stone-200 border-stone-300 group-hover:bg-stone-900 group-hover:border-stone-900"
+                                                ? "bg-foreground"
+                                                : "bg-foreground/10 group-hover:bg-foreground/25"
                                         )} />
                                     </div>
                                     <span className={cn(
-                                        "text-[10px] font-bold uppercase tracking-widest text-center",
-                                        v.active ? "text-stone-900" : "text-stone-400 group-hover:text-stone-700"
+                                        "text-[10px] font-medium uppercase tracking-wider text-center",
+                                        v.active ? "text-foreground font-semibold" : "text-foreground/35 group-hover:text-foreground/60"
                                     )}>
                                         {v.id}
                                     </span>
@@ -170,101 +138,118 @@ export default function AdminOverview() {
                     </div>
                 </div>
 
-                {/* Live Activity Log */}
-                <div className="lg:col-span-4 border border-stone-200 bg-white flex flex-col" style={{ maxHeight: 420 }}>
-                    <div className="px-6 py-4 border-b border-stone-200 bg-stone-50 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-stone-900 animate-pulse" />
-                        <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-900">
-                            Live Activity Log
-                        </h3>
+                {/* Live Activity Log (4 cols) */}
+                <div className="lg:col-span-4 bg-background rounded-2xl border border-foreground/[0.07] flex flex-col overflow-hidden" style={{ maxHeight: 420 }}>
+                    <div className="px-6 py-4 border-b border-foreground/[0.06] flex items-center gap-2.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <div>
+                            <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-foreground/40">Live</p>
+                            <h3 className="font-display text-[1rem] font-light text-foreground leading-tight">Activity Log</h3>
+                        </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto">
-                        <ul className="flex flex-col divide-y divide-stone-100">
-                            {ACTIVITY.map((item, i) => (
-                                <li key={i} className="px-6 py-4 hover:bg-stone-50 transition-colors flex flex-col gap-2">
-                                    <div className="flex justify-between items-center">
-                                        <span className={cn(
-                                            "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 border",
-                                            item.tagStyle
-                                        )}>
-                                            {item.tag}
-                                        </span>
-                                        <span className="text-[10px] text-stone-400">{item.time}</span>
-                                    </div>
-                                    <p className="text-[13px] text-stone-700 leading-snug">{item.msg}</p>
-                                </li>
-                            ))}
-                        </ul>
+                    <div className="flex-1 overflow-y-auto divide-y divide-foreground/[0.05]">
+                        {ACTIVITY.map((item, i) => (
+                            <div key={i} className="px-6 py-4 hover:bg-foreground/[0.02] transition-colors">
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className={cn(
+                                        "text-[10px] font-medium uppercase tracking-[0.1em] px-2 py-0.5 rounded-md",
+                                        item.tagStyle
+                                    )}>
+                                        {item.tag}
+                                    </span>
+                                    <span className="text-[11px] text-foreground/30 font-light">{item.time}</span>
+                                </div>
+                                <p className="text-[13px] font-light text-foreground/70 leading-snug">{item.msg}</p>
+                            </div>
+                        ))}
                     </div>
 
-                    <div className="px-6 py-3 border-t border-stone-200 bg-white text-center">
-                        <Link
-                            href="/admin/orders"
-                            className="text-[10px] font-bold uppercase tracking-widest text-stone-900 hover:opacity-60 transition-opacity"
-                        >
-                            View All Logs
+                    <div className="px-6 py-3 border-t border-foreground/[0.06] text-center">
+                        <Link href="/admin/orders" className="text-[11px] font-medium uppercase tracking-[0.12em] text-foreground/40 hover:text-foreground transition-colors">
+                            View all logs
                         </Link>
                     </div>
                 </div>
 
+                {/* Recent Orders table (full width) */}
+                <div className="lg:col-span-12 bg-background rounded-2xl border border-foreground/[0.07] overflow-hidden">
+                    <div className="px-8 py-5 border-b border-foreground/[0.06] flex justify-between items-center">
+                        <div>
+                            <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-foreground/40">Recent</p>
+                            <h3 className="font-display text-[1rem] font-light text-foreground mt-0.5">Orders</h3>
+                        </div>
+                        <Link href="/admin/orders" className="text-[11px] font-medium uppercase tracking-[0.12em] text-foreground/40 hover:text-foreground transition-colors">
+                            View all →
+                        </Link>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-foreground/[0.06] text-[10px] font-medium uppercase tracking-[0.12em] text-foreground/30">
+                                    {["Order ID", "Customer", "Amount", "Status", ""].map((h, i) => (
+                                        <th key={i} className={cn("px-8 py-3 font-medium", i === 4 && "text-right")}>{h}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-foreground/[0.05]">
+                                {[1, 2, 3, 4, 5].map(i => (
+                                    <tr key={i} className="group hover:bg-foreground/[0.02] transition-colors">
+                                        <td className="px-8 py-4 text-[13px] font-mono font-medium text-foreground/70">
+                                            #ORD-00{i}
+                                        </td>
+                                        <td className="px-8 py-4 text-[13px] font-light text-foreground/70">Demo Customer</td>
+                                        <td className="px-8 py-4 text-[13px] font-medium text-foreground">R2,450.00</td>
+                                        <td className="px-8 py-4">
+                                            <span className={cn(
+                                                "text-[10px] font-medium uppercase tracking-[0.1em] px-2.5 py-1 rounded-full",
+                                                i % 2 === 0
+                                                    ? "bg-amber-100 text-amber-700"
+                                                    : "bg-emerald-100 text-emerald-700"
+                                            )}>
+                                                {i % 2 === 0 ? "Packing" : "Delivered"}
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-4 text-right">
+                                            <button className="p-1.5 opacity-0 group-hover:opacity-100 text-foreground/30 hover:text-foreground transition-all">
+                                                <ArrowUpRight size={16} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </DashboardLayout>
     );
 }
 
-// ─── KPI Card Component ────────────────────────────────────────────────────
-interface KpiCardProps {
-    label: string;
-    value: string;
-    meta: string;
-    metaType: "up" | "neutral" | "error";
-    accent?: boolean;
-}
+// ── KPI Card ───────────────────────────────────────────────────────────────
+function KpiCard({ label, value, change, trend, info }: {
+    label: string; value: string; change: string;
+    trend: "up" | "neutral" | "error"; info: string;
+}) {
+    const chipStyle =
+        trend === "up"      ? "bg-emerald-50 text-emerald-700" :
+        trend === "error"   ? "bg-red-50 text-red-600"         :
+                              "bg-foreground/5 text-foreground/50";
 
-function KpiCard({ label, value, meta, metaType, accent }: KpiCardProps) {
-    const metaColor =
-        metaType === "up"      ? "text-stone-900" :
-        metaType === "error"   ? "text-red-600"   :
-                                 "text-stone-400";
-
-    const arrow =
-        metaType === "up"    ? "↑ " :
-        metaType === "error" ? ""   :
-                               "— ";
+    const Icon = trend === "up" ? TrendingUp : trend === "error" ? TrendingDown : null;
 
     return (
-        <div className={cn(
-            "border p-6 flex flex-col justify-between h-36 relative overflow-hidden",
-            accent
-                ? "bg-stone-100 border-stone-300"
-                : "bg-white border-stone-200"
-        )}>
-            {/* subtle dot pattern for accent card */}
-            {accent && (
-                <div
-                    className="absolute inset-0 opacity-10 pointer-events-none"
-                    style={{
-                        backgroundImage: "radial-gradient(#000 1px, transparent 1px)",
-                        backgroundSize: "16px 16px",
-                    }}
-                />
-            )}
-
-            <div className="relative z-10">
-                <p className={cn(
-                    "text-[10px] font-bold uppercase tracking-widest",
-                    metaType === "error" ? "text-red-600" : "text-stone-500"
-                )}>
-                    {label}
-                </p>
-            </div>
-
-            <div className="relative z-10">
-                <div className="text-3xl font-black tracking-tighter text-stone-900">{value}</div>
-                <div className={cn("text-[10px] font-bold uppercase tracking-widest mt-1.5", metaColor)}>
-                    {arrow}{meta}
-                </div>
+        <div className="bg-background rounded-2xl border border-foreground/[0.07] p-6 hover:border-foreground/15 transition-colors group">
+            <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-foreground/40 mb-4">{label}</p>
+            <h4 className="font-display text-[2rem] font-light text-foreground tracking-tight leading-none mb-4">
+                {value}
+            </h4>
+            <div className="flex items-center gap-2">
+                <span className={cn("flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-lg", chipStyle)}>
+                    {Icon && <Icon size={11} />}
+                    {change}
+                </span>
+                {info && <span className="text-[11px] font-light text-foreground/30">{info}</span>}
             </div>
         </div>
     );

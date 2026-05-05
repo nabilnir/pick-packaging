@@ -2,21 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/dashboard/dashboard-layout';
-import { 
-    Package, 
-    Plus, 
-    Search, 
-    Filter, 
-    Edit, 
-    Trash2, 
-    LayoutDashboard, 
-    ShoppingBag, 
-    Users, 
-    BarChart3, 
-    Settings,
-    Factory,
-    Tag,
-    Archive
+import {
+    Package, Plus, Search,
+    Edit, Trash2, LayoutDashboard,
+    ShoppingBag, Users, BarChart3,
+    Settings, Factory, Tag, Archive,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -32,97 +22,140 @@ const ADMIN_NAV = [
 ];
 
 export default function AdminProducts() {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading]   = useState(true);
+    const [query, setQuery]       = useState("");
 
     useEffect(() => {
         fetch('/api/products')
-            .then(res => res.json())
+            .then(r => r.json())
             .then(data => {
                 if (data.success) setProducts(data.data);
                 setLoading(false);
             });
     }, []);
 
+    const filtered = products.filter((p: any) =>
+        p.name?.toLowerCase().includes(query.toLowerCase()) ||
+        p.category?.toLowerCase().includes(query.toLowerCase()) ||
+        String(p.id)?.toLowerCase().includes(query.toLowerCase())
+    );
+
     return (
-        <DashboardLayout items={ADMIN_NAV} title="Inventory Manager">
-            <div className="space-y-8">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div>
-                        <h2 className="text-[2rem] font-light font-display">Products</h2>
-                        <p className="text-foreground/40 font-light text-[14px]">Manage your global catalog and stock levels.</p>
+        <DashboardLayout items={ADMIN_NAV} title="Administrator">
+
+            {/* ── Page Header ─────────────────────────────────────────── */}
+            <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-foreground/[0.07]">
+                <div>
+                    <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-foreground/40 mb-1">Admin Panel</p>
+                    <h1 className="font-display text-[2.2rem] font-light text-foreground tracking-tight">Products</h1>
+                    <p className="text-[14px] font-light text-foreground/50 mt-1">
+                        Manage your global catalog, pricing, and stock levels.
+                    </p>
+                </div>
+                <button className="shrink-0 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.15em] px-5 py-2.5 bg-foreground text-background rounded-xl hover:bg-foreground/80 transition-colors">
+                    <Plus size={14} /> Add Product
+                </button>
+            </div>
+
+            {/* ── Catalog Card ────────────────────────────────────────── */}
+            <div className="bg-background rounded-2xl border border-foreground/[0.07] overflow-hidden">
+
+                {/* Controls */}
+                <div className="px-6 py-4 border-b border-foreground/[0.06] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-2.5 px-4 py-2 bg-foreground/[0.04] rounded-full border border-foreground/[0.06] w-full md:w-80">
+                        <Search size={14} className="text-foreground/30 shrink-0" />
+                        <input
+                            type="text"
+                            placeholder="Search by name, SKU, or category…"
+                            value={query}
+                            onChange={e => setQuery(e.target.value)}
+                            className="bg-transparent text-[13px] font-light focus:outline-none w-full text-foreground placeholder:text-foreground/30"
+                        />
                     </div>
-                    <button className="flex items-center gap-2 py-4 px-6 bg-foreground text-background rounded-xl text-[12px] font-bold uppercase tracking-widest hover:bg-brand-green transition-all shadow-lg">
-                        <Plus size={18} />
-                        Add New Product
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button className="flex items-center gap-2 text-[11px] font-medium text-foreground/40 hover:text-foreground px-3 py-1.5 rounded-lg hover:bg-foreground/5 transition-colors uppercase tracking-[0.1em]">
+                            <Tag size={13} /> Categories
+                        </button>
+                        <button className="flex items-center gap-2 text-[11px] font-medium text-foreground/40 hover:text-foreground px-3 py-1.5 rounded-lg hover:bg-foreground/5 transition-colors uppercase tracking-[0.1em]">
+                            <Archive size={13} /> Out of Stock
+                        </button>
+                    </div>
                 </div>
 
-                <div className="bg-background rounded-2xl border border-foreground/5 overflow-hidden">
-                    {/* Catalog Controls */}
-                    <div className="p-6 border-b border-foreground/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="flex items-center gap-3 px-4 py-2.5 bg-foreground/3 rounded-xl border border-foreground/5 w-full md:w-96">
-                            <Search size={16} className="opacity-30" />
-                            <input type="text" placeholder="Search by name, SKU, or category..." className="bg-transparent text-[13px] focus:outline-none w-full" />
+                {/* Product list */}
+                <div className="divide-y divide-foreground/[0.05]">
+                    {loading ? (
+                        <div className="py-20 text-center text-[13px] font-light text-foreground/30 italic">
+                            Loading inventory…
                         </div>
-                        <div className="flex items-center gap-3">
-                            <button className="flex items-center gap-2 px-4 py-2.5 border border-foreground/5 rounded-xl text-[12px] hover:bg-foreground/5 transition-all">
-                                <Tag size={16} />
-                                Categories
-                            </button>
-                            <button className="flex items-center gap-2 px-4 py-2.5 border border-foreground/5 rounded-xl text-[12px] hover:bg-foreground/5 transition-all">
-                                <Archive size={16} />
-                                Out of Stock
-                            </button>
+                    ) : filtered.length === 0 ? (
+                        <div className="py-20 text-center text-[13px] font-light text-foreground/30">
+                            No products found
                         </div>
-                    </div>
-
-                    {/* Product List */}
-                    <div className="grid grid-cols-1 divide-y divide-foreground/5">
-                        {loading ? (
-                            <div className="py-20 text-center opacity-20 italic">Loading inventory...</div>
-                        ) : products.map((product: any) => (
-                            <div key={product._id} className="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-8 group hover:bg-foreground/[0.01] transition-colors">
-                                <div className="flex items-center gap-6 flex-1 min-w-0">
-                                    <div className="relative w-24 h-24 rounded-xl bg-foreground/5 overflow-hidden p-2 border border-foreground/5 shrink-0">
-                                        <Image src={product.image} alt={product.name} fill className="object-contain p-2" />
-                                    </div>
-                                    <div className="min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-green px-2 py-0.5 bg-brand-green/10 rounded-sm">
-                                                {product.category}
-                                            </span>
-                                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-30">
-                                                ID: {product.id}
-                                            </span>
-                                        </div>
-                                        <h4 className="text-[1.25rem] font-light truncate mb-2">{product.name}</h4>
-                                        <p className="text-[14px] font-bold">R{product.price.toFixed(2)}</p>
-                                    </div>
+                    ) : filtered.map((product: any) => (
+                        <div
+                            key={product._id}
+                            className="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:bg-foreground/[0.01] transition-colors"
+                        >
+                            {/* Product info */}
+                            <div className="flex items-center gap-6 flex-1 min-w-0">
+                                <div className="relative w-20 h-20 rounded-xl bg-foreground/[0.04] overflow-hidden border border-foreground/[0.06] shrink-0">
+                                    <Image
+                                        src={product.image}
+                                        alt={product.name}
+                                        fill
+                                        className="object-contain p-2"
+                                    />
                                 </div>
-
-                                <div className="flex items-center gap-12">
-                                    <div className="text-right hidden lg:block">
-                                        <p className="text-[12px] uppercase tracking-widest font-bold opacity-30 mb-1">Status</p>
-                                        <div className="flex items-center gap-2 justify-end">
-                                            <div className="w-2 h-2 rounded-full bg-brand-green animate-pulse" />
-                                            <span className="text-[13px] font-medium">In Stock</span>
-                                        </div>
+                                <div className="min-w-0">
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-foreground/40 bg-foreground/5 px-2 py-0.5 rounded-full">
+                                            {product.category}
+                                        </span>
+                                        <span className="text-[10px] font-light text-foreground/25 font-mono">
+                                            #{product.id}
+                                        </span>
                                     </div>
-                                    
-                                    <div className="flex items-center gap-2">
-                                        <button className="p-3 bg-foreground/3 rounded-xl hover:bg-foreground/5 transition-all text-foreground/40 hover:text-foreground border border-foreground/5">
-                                            <Edit size={18} />
-                                        </button>
-                                        <button className="p-3 bg-red-50 rounded-xl hover:bg-red-100 transition-all text-red-400 hover:text-red-500 border border-red-100 flex items-center justify-center">
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
+                                    <h4 className="font-display text-[1.1rem] font-light text-foreground truncate tracking-tight">
+                                        {product.name}
+                                    </h4>
+                                    <p className="text-[13px] font-medium text-foreground/70 mt-0.5">
+                                        R{product.price.toFixed(2)}
+                                    </p>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+
+                            {/* Right section */}
+                            <div className="flex items-center gap-8 shrink-0">
+                                <div className="hidden lg:block text-right">
+                                    <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-foreground/30 mb-1">Status</p>
+                                    <div className="flex items-center gap-1.5 justify-end">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                        <span className="text-[12px] font-medium text-foreground/60">In Stock</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button className="p-2.5 rounded-xl bg-foreground/[0.04] hover:bg-foreground/[0.08] border border-foreground/[0.06] text-foreground/40 hover:text-foreground transition-all">
+                                        <Edit size={15} />
+                                    </button>
+                                    <button className="p-2.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-100 text-red-400 hover:text-red-500 transition-all">
+                                        <Trash2 size={15} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
+
+                {/* Footer */}
+                {!loading && (
+                    <div className="px-8 py-3 border-t border-foreground/[0.06]">
+                        <span className="text-[11px] font-light text-foreground/30">
+                            {filtered.length} of {products.length} products
+                        </span>
+                    </div>
+                )}
             </div>
         </DashboardLayout>
     );
