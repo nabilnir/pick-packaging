@@ -3,12 +3,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { Announcement } from '@/types/dashboard';
 
-export interface Announcement {
-  id: string;
-  message: string;
-  href?: string;
-}
+export type { Announcement };
 
 export interface AnnouncementBannerProps {
   announcements: Announcement[];
@@ -16,22 +14,19 @@ export interface AnnouncementBannerProps {
 
 export function AnnouncementBanner({ announcements }: AnnouncementBannerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [dismissed, setDismissed] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const count = announcements.length;
+  const [dismissed, setDismissed]       = useState(false);
+  const [isPaused, setIsPaused]         = useState(false);
+  const intervalRef                     = useRef<NodeJS.Timeout | null>(null);
+  const count                           = announcements.length;
 
   const advance = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % count);
+    setCurrentIndex(prev => (prev + 1) % count);
   }, [count]);
 
   useEffect(() => {
     if (count <= 1 || isPaused) return;
     intervalRef.current = setInterval(advance, 6000);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [count, isPaused, advance]);
 
   if (dismissed || count === 0) return null;
@@ -46,7 +41,7 @@ export function AnnouncementBanner({ announcements }: AnnouncementBannerProps) {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Message */}
-      <div className="flex-1 flex items-center justify-center min-w-0 gap-2">
+      <div className="flex-1 flex items-center justify-center min-w-0">
         {current.href ? (
           <Link
             href={current.href}
@@ -55,15 +50,12 @@ export function AnnouncementBanner({ announcements }: AnnouncementBannerProps) {
             {current.message}
           </Link>
         ) : (
-          <p className="text-sm font-medium text-white/90 truncate">
-            {current.message}
-          </p>
+          <p className="text-sm font-medium text-white/90 truncate">{current.message}</p>
         )}
       </div>
 
-      {/* Right side: dot indicators + dismiss */}
+      {/* Dots + dismiss */}
       <div className="flex items-center gap-3 shrink-0 ml-4">
-        {/* Dot indicators — only when multiple */}
         {count > 1 && (
           <div className="flex items-center gap-1.5">
             {announcements.map((_, i) => (
@@ -71,17 +63,16 @@ export function AnnouncementBanner({ announcements }: AnnouncementBannerProps) {
                 key={i}
                 onClick={() => setCurrentIndex(i)}
                 aria-label={`Go to announcement ${i + 1}`}
-                className={`w-1.5 h-1.5 rounded-full transition-all ${
+                className={cn(
+                  'w-1.5 h-1.5 rounded-full transition-all',
                   i === currentIndex
                     ? 'bg-teal-400 scale-125'
                     : 'bg-white/30 hover:bg-white/50'
-                }`}
+                )}
               />
             ))}
           </div>
         )}
-
-        {/* Dismiss */}
         <button
           onClick={() => setDismissed(true)}
           aria-label="Dismiss announcement"

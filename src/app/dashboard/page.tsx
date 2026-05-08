@@ -16,12 +16,19 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// ─── New overview components ──────────────────────────────────────────────────
-import { AnnouncementBanner, type Announcement } from '@/components/dashboard/overview/AnnouncementBanner';
-import { SpendKpis, type SpendKpiData } from '@/components/dashboard/overview/SpendKpis';
-import { RecentOrdersMini, type RecentOrder } from '@/components/dashboard/overview/RecentOrdersMini';
-import { WishlistTeaser, type WishlistPreview } from '@/components/dashboard/overview/WishlistTeaser';
+// ─── Shared types ─────────────────────────────────────────────────────────────
+import type { SpendKpiData, RecentOrder, WishlistPreview, Announcement } from '@/types/dashboard';
+
+// ─── Mock data (replace with API when ready) ──────────────────────────────────
+import { mockAnnouncements } from '@/lib/dashboard/mock-overview';
+
+// ─── Overview components ──────────────────────────────────────────────────────
+import { AnnouncementBanner } from '@/components/dashboard/overview/AnnouncementBanner';
+import { SpendKpis } from '@/components/dashboard/overview/SpendKpis';
+import { RecentOrdersMini } from '@/components/dashboard/overview/RecentOrdersMini';
+import { WishlistTeaser } from '@/components/dashboard/overview/WishlistTeaser';
 import { NoActiveOrder } from '@/components/dashboard/overview/NoActiveOrder';
 
 // ─── Constants ─────────────────────────────────────────────────────────────
@@ -33,14 +40,7 @@ const USER_NAV = [
     { label: "Settings",   href: "/dashboard/settings",   icon: User },
 ];
 
-// Static announcements — swap for an API fetch if needed later
-const ANNOUNCEMENTS: Announcement[] = [
-    {
-        id: 'vendor-packrite',
-        message: '🎉 New vendor Packrite now verified — explore industrial packaging →',
-        href: '/shop?vendor=packrite',
-    },
-];
+// Announcements sourced from mock; swap for API fetch when backend is ready
 
 // ─── Dashboard page ───────────────────────────────────────────────────────────
 export default function UserDashboard() {
@@ -112,7 +112,7 @@ export default function UserDashboard() {
             <div className="space-y-6 p-6 max-w-[1200px]">
 
                 {/* 1 ── Announcement banner */}
-                <AnnouncementBanner announcements={ANNOUNCEMENTS} />
+                <AnnouncementBanner announcements={mockAnnouncements} />
 
                 {/* 2 ── Greeting */}
                 <div>
@@ -136,9 +136,9 @@ export default function UserDashboard() {
                         {/* Active order monitoring */}
                         <section>
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-xs font-bold uppercase tracking-widest text-gray-500">
+                                <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-medium">
                                     Active Order Monitoring
-                                </h2>
+                                </span>
                                 <Link
                                     href="/dashboard/orders"
                                     className="text-sm font-medium text-[#1c3a2a] hover:underline"
@@ -148,9 +148,9 @@ export default function UserDashboard() {
                             </div>
 
                             {activeOrder ? (
-                                <div className="bg-white rounded-lg border border-gray-200 p-8">
+                                <div className="bg-white border border-border rounded-lg p-5">
                                     {/* Order meta */}
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-8 border-b border-gray-100">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-border">
                                         <div>
                                             <p className="text-[11px] uppercase tracking-widest font-bold text-gray-400 mb-1">
                                                 Order #{activeOrder._id.substring(0, 6).toUpperCase()}
@@ -181,7 +181,7 @@ export default function UserDashboard() {
                     <div className="space-y-6">
 
                         {/* Fast checkout */}
-                        <div className="bg-[#1a1f1a] text-white rounded-lg p-8">
+                        <div className="bg-[#1a1f1a] text-white rounded-lg p-5">
                             <h3 className="text-xl font-light mb-3 font-display">Fast Checkout</h3>
                             <p className="text-white/60 text-[13px] font-light mb-6 leading-relaxed">
                                 {cartItems.length > 0
@@ -302,17 +302,17 @@ function PrimaryAddressPanel() {
     }, []);
 
     return (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2 mb-4">
-                <MapPin size={13} />
-                Primary Address
-            </h3>
+        <div className="bg-white border border-border rounded-lg p-5">
+            <div className="flex items-center gap-2 mb-4">
+                <MapPin size={13} className="text-muted-foreground" />
+                <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-medium">Primary Address</span>
+            </div>
 
             {loading ? (
                 <div className="space-y-2">
-                    <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
-                    <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
-                    <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-4 w-40" />
                 </div>
             ) : address ? (
                 <>
