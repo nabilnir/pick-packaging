@@ -1,125 +1,211 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/dashboard/dashboard-layout';
-import { 
-    LayoutDashboard, 
-    ShoppingBag, 
-    Heart, 
-    MapPin, 
+import {
+    LayoutDashboard,
+    ShoppingBag,
+    Heart,
+    MapPin,
     User,
-    Package,
+    Check,
     ArrowRight,
-    Search,
-    Clock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
-import { useEffect } from 'react';
+import { useCart } from '@/contexts/cart-context';
+import { useWishlist } from '@/contexts/wishlist-context';
 
+// ─── New overview components ──────────────────────────────────────────────────
+import { AnnouncementBanner, type Announcement } from '@/components/dashboard/overview/AnnouncementBanner';
+import { SpendKpis, type SpendKpiData } from '@/components/dashboard/overview/SpendKpis';
+import { RecentOrdersMini, type RecentOrder } from '@/components/dashboard/overview/RecentOrdersMini';
+import { WishlistTeaser, type WishlistPreview } from '@/components/dashboard/overview/WishlistTeaser';
+import { NoActiveOrder } from '@/components/dashboard/overview/NoActiveOrder';
+
+// ─── Constants ─────────────────────────────────────────────────────────────
+const USER_NAV = [
+    { label: "Overview",   href: "/dashboard",            icon: LayoutDashboard },
+    { label: "My Orders",  href: "/dashboard/orders",     icon: ShoppingBag },
+    { label: "Wishlist",   href: "/dashboard/wishlist",   icon: Heart },
+    { label: "Addresses",  href: "/dashboard/addresses",  icon: MapPin },
+    { label: "Settings",   href: "/dashboard/settings",   icon: User },
+];
+
+// Static announcements — swap for an API fetch if needed later
+const ANNOUNCEMENTS: Announcement[] = [
+    {
+        id: 'vendor-packrite',
+        message: '🎉 New vendor Packrite now verified — explore industrial packaging →',
+        href: '/shop?vendor=packrite',
+    },
+];
+
+// ─── Dashboard page ───────────────────────────────────────────────────────────
 export default function UserDashboard() {
     const { user } = useAuth();
-    
-    const USER_NAV = [
-        { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-        { label: "My Orders", href: "/dashboard/orders", icon: ShoppingBag },
-        { label: "Wishlist", href: "/dashboard/wishlist", icon: Heart },
-        { label: "Addresses", href: "/dashboard/addresses", icon: MapPin },
-        { label: "Settings", href: "/dashboard/settings", icon: User },
-    ];
+    const { items: cartItems } = useCart();
+    const { items: wishlistItems, itemCount: wishlistCount } = useWishlist();
+
+    const [orders, setOrders]   = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const firstName =
+        user?.displayName?.split(' ')[0] ||
+        user?.email?.split('@')[0] ||
+        'there';
+
+    // ── Fetch orders ──────────────────────────────────────────────────────────
+    useEffect(() => {
+        if (!user?.email) return;
+        fetch(`/api/orders?email=${user.email}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) setOrders(data.data);
+            })
+            .finally(() => setLoading(false));
+    }, [user]);
+
+    // ── Derived data ──────────────────────────────────────────────────────────
+    const activeOrder = orders.find(
+        o => !['Delivered', 'Cancelled'].includes(o.status)
+    ) ?? null;
+
+    const recentOrders: RecentOrder[] = orders.slice(0, 3).map(o => ({
+        id:          o._id,
+        orderNumber: `#ORD-${o._id.substring(0, 6).toUpperCase()}`,
+        date:        o.createdAt,
+        status:      o.status,
+        totalAmount: o.totalAmount,
+        items:       o.items ?? [],
+    }));
+
+    const kpis: SpendKpiData | null = loading ? null : {
+        totalLifetimeSpend: orders
+            .filter(o => o.status !== 'Cancelled')
+            .reduce((s: number, o: any) => s + (o.totalAmount ?? 0), 0),
+        spentThisMonth: orders
+            .filter((o: any) => {
+                const d = new Date(o.createdAt);
+                const now = new Date();
+                return d.getMonth() === now.getMonth() &&
+                       d.getFullYear() === now.getFullYear() &&
+                       o.status !== 'Cancelled';
+            })
+            .reduce((s: number, o: any) => s + (o.totalAmount ?? 0), 0),
+        spendDeltaPct: 0, // extend with real prev-month comparison when available
+        totalOrdersPlaced: orders.length,
+    };
+
+    const wishlistPreviews: WishlistPreview[] = wishlistItems.slice(0, 4).map(i => ({
+        id:    i.id,
+        image: i.image,
+        name:  i.name,
+    }));
+
+    // ── Primary address (static until addresses API is wired here) ────────────
+    const primaryAddress = { name: '', line1: '', line2: '', country: '' };
 
     return (
         <DashboardLayout items={USER_NAV} title="Account Dashboard">
-            <div className="max-w-6xl">
-                {/* Welcome Message */}
-                <div className="mb-12">
-                    <h2 className="text-[2.5rem] font-light font-display leading-tight mb-2">Hello, {user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'User'}</h2>
-                    <p className="text-foreground/40 font-light text-[1.1rem]">Welcome back to your PickPacking account. Here's what's happening today.</p>
+            <div className="space-y-6 p-6 max-w-[1200px]">
+
+                {/* 1 ── Announcement banner */}
+                <AnnouncementBanner announcements={ANNOUNCEMENTS} />
+
+                {/* 2 ── Greeting */}
+                <div>
+                    <h1 className="text-3xl font-light text-[#1a1f1a]">
+                        Hello, {firstName}
+                    </h1>
+                    <p className="text-foreground/50 mt-1 text-[15px] font-light">
+                        Welcome back to your PickPacking account. Here's what's happening today.
+                    </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                    {/* Left: Active Order Monitoring */}
-                    <div className="lg:col-span-8 space-y-10">
+                {/* 3 ── KPI strip */}
+                <SpendKpis data={kpis} isLoading={loading} />
+
+                {/* 4 ── Main grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
+
+                    {/* ── Left column ── */}
+                    <div className="space-y-6">
+
+                        {/* Active order monitoring */}
                         <section>
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-[14px] uppercase tracking-[0.2em] font-bold opacity-40">Active Order Monitoring</h3>
-                                <Link href="/dashboard/orders" className="text-[12px] font-bold text-brand-green border-b border-brand-green/20">View Order Details</Link>
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-xs font-bold uppercase tracking-widest text-gray-500">
+                                    Active Order Monitoring
+                                </h2>
+                                <Link
+                                    href="/dashboard/orders"
+                                    className="text-sm font-medium text-[#1c3a2a] hover:underline"
+                                >
+                                    View order details
+                                </Link>
                             </div>
-                            
-                            <div className="bg-background rounded-2xl border border-foreground/5 p-8 shadow-sm">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-10 border-b border-foreground/5">
-                                    <div>
-                                        <p className="text-[12px] opacity-40 uppercase tracking-widest font-bold mb-1">Order #ORD-992120</p>
-                                        <h4 className="text-[1.25rem] font-light">Expected Arrival: Thursday, 14 Apr</h4>
-                                    </div>
-                                    <div className="px-5 py-2 rounded-full bg-amber-50 text-amber-600 text-[12px] font-bold uppercase tracking-widest">
-                                        Currently Processing
-                                    </div>
-                                </div>
 
-                                {/* Tracking Stepper */}
-                                <div className="relative pt-4 pb-12">
-                                    <div className="absolute top-[28px] left-[15px] right-[15px] h-[2px] bg-foreground/5 z-0" />
-                                    <div className="absolute top-[28px] left-[15px] w-[50%] h-[2px] bg-brand-green z-0" />
-                                    
-                                    <div className="relative z-10 flex justify-between">
-                                        <TrackingStep label="Placed" time="10 Apr, 14:20" completed />
-                                        <TrackingStep label="Processing" time="11 Apr, 08:30" completed active />
-                                        <TrackingStep label="Packing" time="Est. 12 Apr" />
-                                        <TrackingStep label="Delivery" time="Est. 14 Apr" />
+                            {activeOrder ? (
+                                <div className="bg-white rounded-lg border border-gray-200 p-8">
+                                    {/* Order meta */}
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-8 border-b border-gray-100">
+                                        <div>
+                                            <p className="text-[11px] uppercase tracking-widest font-bold text-gray-400 mb-1">
+                                                Order #{activeOrder._id.substring(0, 6).toUpperCase()}
+                                            </p>
+                                            <h3 className="text-lg font-light text-[#1a1f1a]">
+                                                Expected Arrival:{' '}
+                                                {activeOrder.estimatedDelivery
+                                                    ? new Date(activeOrder.estimatedDelivery).toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'short' })
+                                                    : 'To be confirmed'}
+                                            </h3>
+                                        </div>
+                                        <StatusPill status={activeOrder.status} />
                                     </div>
+
+                                    {/* Stepper */}
+                                    <OrderStepper status={activeOrder.status} createdAt={activeOrder.createdAt} />
                                 </div>
-                            </div>
+                            ) : (
+                                <NoActiveOrder />
+                            )}
                         </section>
 
-                        <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <ActionCard 
-                                icon={Package} 
-                                title="Recent Purchases" 
-                                description="Re-order your favorite products with one click." 
-                                href="/dashboard/orders"
-                            />
-                            <ActionCard 
-                                icon={Heart} 
-                                title="Saved for Later" 
-                                description="You have 12 items in your wishlist." 
-                                href="/dashboard/wishlist"
-                            />
-                        </section>
+                        {/* Recent orders mini-list */}
+                        <RecentOrdersMini orders={recentOrders} isLoading={loading} />
                     </div>
 
-                    {/* Right: Quick Overview */}
-                    <div className="lg:col-span-4 space-y-8">
-                        <div className="bg-foreground text-background rounded-2xl p-8">
-                            <h3 className="text-[1.25rem] font-light mb-6 font-display">Fast Checkout</h3>
-                            <p className="text-background/60 text-[13px] font-light mb-8 leading-relaxed">
-                                You have 4 items in your cart ready for checkout.
+                    {/* ── Right column ── */}
+                    <div className="space-y-6">
+
+                        {/* Fast checkout */}
+                        <div className="bg-[#1a1f1a] text-white rounded-lg p-8">
+                            <h3 className="text-xl font-light mb-3 font-display">Fast Checkout</h3>
+                            <p className="text-white/60 text-[13px] font-light mb-6 leading-relaxed">
+                                {cartItems.length > 0
+                                    ? `You have ${cartItems.length} item${cartItems.length > 1 ? 's' : ''} in your cart ready for checkout.`
+                                    : 'Your cart is empty. Start adding products to checkout faster.'}
                             </p>
-                            <Link 
-                                href="/checkout"
-                                className="inline-flex items-center gap-2 py-3 px-6 rounded-full bg-brand-green text-white text-[12px] font-bold uppercase tracking-widest hover:opacity-90 transition-all"
+                            <Link
+                                href={cartItems.length > 0 ? '/checkout' : '/shop'}
+                                className="inline-flex items-center gap-2 py-3 px-6 bg-[#1c3a2a] text-white rounded-md text-[12px] font-bold uppercase tracking-widest hover:opacity-90 transition-all"
                             >
-                                Finish Order
+                                {cartItems.length > 0 ? 'Finish Order' : 'Browse Products'}
                                 <ArrowRight size={16} />
                             </Link>
                         </div>
 
-                        <div className="bg-background rounded-2xl border border-foreground/5 p-8">
-                            <h3 className="text-[14px] uppercase tracking-widest font-bold opacity-40 mb-6 flex items-center gap-2">
-                                <MapPin size={14} />
-                                Primary Address
-                            </h3>
-                            <p className="text-[14px] font-medium mb-1">Sarah Jenkins</p>
-                            <p className="text-[14px] opacity-60 font-light leading-relaxed">
-                                123 Industrial Way<br />
-                                Cape Town 8001<br />
-                                South Africa
-                            </p>
-                            <button className="text-[11px] uppercase tracking-widest font-bold text-brand-green mt-6">Edit Address</button>
-                        </div>
+                        {/* Wishlist teaser */}
+                        <WishlistTeaser
+                            count={wishlistCount}
+                            previews={wishlistPreviews}
+                            isLoading={loading}
+                        />
+
+                        {/* Primary address panel */}
+                        <PrimaryAddressPanel />
                     </div>
                 </div>
             </div>
@@ -127,38 +213,127 @@ export default function UserDashboard() {
     );
 }
 
-function TrackingStep({ label, time, completed = false, active = false }: { label: string, time: string, completed?: boolean, active?: boolean }) {
+// ─── Status pill ──────────────────────────────────────────────────────────────
+function StatusPill({ status }: { status: string }) {
+    const map: Record<string, string> = {
+        Placed:      'bg-gray-100 text-gray-600',
+        Processing:  'bg-amber-50 text-amber-700',
+        Packing:     'bg-blue-50 text-blue-700',
+        Dispatched:  'bg-purple-50 text-purple-700',
+        Delivered:   'bg-teal-50 text-teal-700',
+        Cancelled:   'bg-red-50 text-red-600',
+    };
     return (
-        <div className="flex flex-col items-center gap-3">
-            <div className={cn(
-                "w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all",
-                completed && !active ? "bg-brand-green border-brand-green text-white" : "",
-                active ? "border-brand-green bg-background text-brand-green shadow-[0_0_15px_rgba(46,204,113,0.3)]" : "",
-                !completed && !active ? "bg-background border-foreground/10 text-foreground/20" : ""
-            )}>
-                {completed && !active ? <Check size={16} strokeWidth={3} /> : <div className={cn("w-2 h-2 rounded-full", active ? "bg-brand-green animate-pulse" : "bg-current")} />}
-            </div>
-            <div className="text-center">
-                <p className={cn("text-[12px] font-bold uppercase tracking-widest mb-1", active ? "text-brand-green" : "opacity-60")}>{label}</p>
-                <p className="text-[10px] opacity-30 font-medium">{time}</p>
+        <span className={cn(
+            'px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest',
+            map[status] ?? 'bg-gray-100 text-gray-500'
+        )}>
+            {status}
+        </span>
+    );
+}
+
+// ─── Order stepper ────────────────────────────────────────────────────────────
+const STEPS = ['Placed', 'Processing', 'Packing', 'Dispatched', 'Delivered'] as const;
+type Step = typeof STEPS[number];
+
+function OrderStepper({ status, createdAt }: { status: string; createdAt: string }) {
+    const currentIdx = STEPS.indexOf(status as Step);
+
+    return (
+        <div className="relative pt-4 pb-10">
+            {/* Track */}
+            <div className="absolute top-[28px] left-[15px] right-[15px] h-[2px] bg-gray-100 z-0" />
+            {/* Progress fill */}
+            <div
+                className="absolute top-[28px] left-[15px] h-[2px] bg-[#1c3a2a] z-0 transition-all duration-500"
+                style={{ width: `${(currentIdx / (STEPS.length - 1)) * 100}%` }}
+            />
+            <div className="relative z-10 flex justify-between">
+                {STEPS.map((step, idx) => {
+                    const done   = idx < currentIdx;
+                    const active = idx === currentIdx;
+                    return (
+                        <div key={step} className="flex flex-col items-center gap-3">
+                            <div className={cn(
+                                "w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all",
+                                done   ? "bg-[#1c3a2a] border-[#1c3a2a] text-white"            : "",
+                                active ? "border-[#1c3a2a] bg-white text-[#1c3a2a] shadow-md"  : "",
+                                !done && !active ? "bg-white border-gray-200 text-gray-300"    : "",
+                            )}>
+                                {done
+                                    ? <Check size={14} strokeWidth={3} />
+                                    : <div className={cn("w-2 h-2 rounded-full", active ? "bg-[#1c3a2a] animate-pulse" : "bg-gray-200")} />
+                                }
+                            </div>
+                            <div className="text-center">
+                                <p className={cn(
+                                    "text-[11px] font-bold uppercase tracking-widest mb-0.5",
+                                    active ? "text-[#1c3a2a]" : "text-gray-400"
+                                )}>
+                                    {step}
+                                </p>
+                                <p className="text-[10px] text-gray-300">
+                                    {idx === 0 ? new Date(createdAt).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' }) : ''}
+                                </p>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
 }
 
-function ActionCard({ icon: Icon, title, description, href }: { icon: any, title: string, description: string, href: string }) {
+// ─── Primary address panel ────────────────────────────────────────────────────
+function PrimaryAddressPanel() {
+    const [address, setAddress] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('/api/addresses')
+            .then(r => r.json())
+            .then(data => {
+                const primary = (data.addresses ?? []).find((a: any) => a.isDefault) ?? data.addresses?.[0] ?? null;
+                setAddress(primary);
+            })
+            .catch(() => {})
+            .finally(() => setLoading(false));
+    }, []);
+
     return (
-        <Link 
-            href={href}
-            className="group p-8 rounded-2xl border border-foreground/5 bg-background hover:border-brand-green/20 transition-all shadow-sm"
-        >
-            <div className="w-10 h-10 rounded-xl bg-foreground/3 flex items-center justify-center text-foreground/40 group-hover:text-brand-green group-hover:bg-brand-green/5 transition-all mb-6">
-                <Icon size={20} />
-            </div>
-            <h4 className="text-[1.1rem] font-medium mb-2">{title}</h4>
-            <p className="text-[13px] opacity-40 font-light mb-0 leading-relaxed">{description}</p>
-        </Link>
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2 mb-4">
+                <MapPin size={13} />
+                Primary Address
+            </h3>
+
+            {loading ? (
+                <div className="space-y-2">
+                    <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
+                </div>
+            ) : address ? (
+                <>
+                    <p className="text-[14px] font-medium text-[#1a1f1a] mb-1">
+                        {address.fullName ?? address.name ?? ''}
+                    </p>
+                    <p className="text-[13px] text-gray-500 font-light leading-relaxed">
+                        {address.line1 ?? address.addressLine1}<br />
+                        {address.city} {address.postalCode}<br />
+                        {address.country}
+                    </p>
+                    <Link
+                        href="/dashboard/addresses"
+                        className="inline-block mt-4 text-[11px] uppercase tracking-widest font-bold text-[#1c3a2a] hover:underline"
+                    >
+                        Edit Address
+                    </Link>
+                </>
+            ) : (
+                <div className="text-sm text-gray-400">No address saved yet.</div>
+            )}
+        </div>
     );
 }
-
-import { Check } from 'lucide-react';
