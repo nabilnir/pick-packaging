@@ -23,6 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { CancellationModal } from '@/components/dashboard/orders/CancellationModal';
 import type { Order, OrderStatus } from '@/types/dashboard';
 
 export interface OrderCardProps {
@@ -106,7 +107,8 @@ function OrderStepper({ status }: { status: OrderStatus }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export function OrderCard({ order, defaultExpanded = false }: OrderCardProps) {
-  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [expanded, setExpanded]     = useState(defaultExpanded);
+  const [cancelOpen, setCancelOpen] = useState(false);
   const { addToCart } = useCart();
   const router = useRouter();
 
@@ -184,7 +186,10 @@ export function OrderCard({ order, defaultExpanded = false }: OrderCardProps) {
               {cancellable && (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600">
+                  <DropdownMenuItem
+                    onClick={() => setCancelOpen(true)}
+                    className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                  >
                     <XCircle size={14} />
                     Request cancellation
                   </DropdownMenuItem>
@@ -334,7 +339,10 @@ export function OrderCard({ order, defaultExpanded = false }: OrderCardProps) {
                   Reorder
                 </button>
                 {cancellable && (
-                  <button className="w-full pt-1 text-xs font-medium text-red-500 hover:text-red-600 transition-colors">
+                  <button
+                    onClick={() => setCancelOpen(true)}
+                    className="w-full pt-1 text-xs font-medium text-red-500 hover:text-red-600 transition-colors"
+                  >
                     Request cancellation
                   </button>
                 )}
@@ -344,6 +352,13 @@ export function OrderCard({ order, defaultExpanded = false }: OrderCardProps) {
           </div>
         </div>
       </div>
+
+      {/* Cancellation modal */}
+      <CancellationModal
+        order={order}
+        open={cancelOpen}
+        onClose={() => setCancelOpen(false)}
+      />
     </div>
   );
 }
