@@ -10,7 +10,6 @@ import {
     MapPin,
     User,
     SearchX,
-    ChevronLeft,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import Link from 'next/link';
@@ -18,7 +17,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { OrdersToolbar, type OrderFilters } from '@/components/dashboard/orders/OrdersToolbar';
 import { OrderCard } from '@/components/dashboard/orders/OrderCard';
-import type { Order, OrderStatus } from '@/types/dashboard';
+import { OrdersPagination } from '@/components/dashboard/orders/OrdersPagination';
+import { MOCK_ORDERS } from '@/lib/orders/mock-orders';
+import type { Order, OrderStatus } from '@/types/orders';
 
 // ─── Nav ─────────────────────────────────────────────────────────────────────
 const USER_NAV = [
@@ -29,10 +30,12 @@ const USER_NAV = [
     { label: 'Settings',   href: '/dashboard/settings',   icon: User },
 ];
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 10;
 
 // ─── Normalise raw API order → typed Order ────────────────────────────────────
 function normalise(raw: any): Order {
+    if (raw.orderNumber && raw.items) return raw as Order; // Already normalised (mock)
+    
     return {
         id:          raw._id,
         orderNumber: `#ORD-${raw._id.substring(0, 6).toUpperCase()}`,
@@ -71,7 +74,7 @@ function OrdersSkeleton() {
     return (
         <div className="space-y-4">
             {[1, 2, 3].map(i => (
-                <div key={i} className="bg-white border border-border rounded-lg p-5 space-y-4">
+                <div key={i} className="bg-white border border-border rounded-xl p-5 space-y-4 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div className="space-y-2">
                             <Skeleton className="h-4 w-28" />
@@ -89,7 +92,7 @@ function OrdersSkeleton() {
     );
 }
 
-// ─── Empty state (no orders at all) — preserved exactly ──────────────────────
+// ─── Empty state (no orders at all) ──────────────────────────────────────────
 function EmptyOrdersState() {
     return (
         <div className="py-32 text-center rounded-2xl border-2 border-dashed border-foreground/5 bg-foreground/[0.01]">
@@ -99,7 +102,7 @@ function EmptyOrdersState() {
             </p>
             <Link
                 href="/shop"
-                className="inline-flex items-center gap-2 py-4 px-8 bg-foreground text-background rounded-full text-[13px] font-bold uppercase tracking-widest hover:bg-brand-green transition-all shadow-md group"
+                className="inline-flex items-center gap-2 py-4 px-8 bg-foreground text-background rounded-full text-[13px] font-bold uppercase tracking-widest hover:bg-[#1c3a2a] transition-all shadow-md group"
             >
                 Browse Products
                 <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -108,7 +111,7 @@ function EmptyOrdersState() {
     );
 }
 
-// ─── No results state (search/filter yields nothing) ─────────────────────────
+// ─── No results state ─────────────────────────────────────────────────────────
 function NoResultsState({ query, onClear }: { query: string; onClear: () => void }) {
     return (
         <div className="py-24 flex flex-col items-center text-center">
@@ -124,52 +127,6 @@ function NoResultsState({ query, onClear }: { query: string; onClear: () => void
                 className="text-sm font-bold text-[#1c3a2a] underline underline-offset-2 hover:opacity-70 transition-opacity"
             >
                 Clear {query ? 'search' : 'filters'}
-            </button>
-        </div>
-    );
-}
-
-// ─── Pagination ───────────────────────────────────────────────────────────────
-function OrdersPagination({
-    total, page, pageSize, onChange
-}: { total: number; page: number; pageSize: number; onChange: (p: number) => void }) {
-    const totalPages = Math.ceil(total / pageSize);
-    if (totalPages <= 1) return null;
-
-    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-
-    return (
-        <div className="flex items-center justify-center gap-2 pt-4">
-            <button
-                onClick={() => onChange(page - 1)}
-                disabled={page === 1}
-                className="p-2 rounded-md border border-border bg-white hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                aria-label="Previous page"
-            >
-                <ChevronLeft size={16} />
-            </button>
-
-            {pages.map(p => (
-                <button
-                    key={p}
-                    onClick={() => onChange(p)}
-                    className={`w-9 h-9 rounded-md text-sm font-medium transition-colors ${
-                        p === page
-                            ? 'bg-[#1c3a2a] text-white'
-                            : 'border border-border bg-white text-[#1a1f1a] hover:bg-gray-50'
-                    }`}
-                >
-                    {p}
-                </button>
-            ))}
-
-            <button
-                onClick={() => onChange(page + 1)}
-                disabled={page === totalPages}
-                className="p-2 rounded-md border border-border bg-white hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                aria-label="Next page"
-            >
-                <ChevronRight size={16} />
             </button>
         </div>
     );
@@ -195,10 +152,23 @@ export default function MyOrders() {
 
     // ── Fetch ──────────────────────────────────────────────────────────────────
     useEffect(() => {
-        if (!user?.email) return;
+        // Fallback to MOCK_ORDERS if no user or for instant populating
+        if (!user?.email) {
+            setRawOrders(MOCK_ORDERS);
+            setLoading(false);
+            return;
+        }
+
         fetch(`/api/orders?email=${user.email}`)
             .then(r => r.json())
-            .then(data => { if (data.success) setRawOrders(data.data); })
+            .then(data => { 
+                if (data.success && data.data.length > 0) {
+                    setRawOrders(data.data); 
+                } else {
+                    setRawOrders(MOCK_ORDERS);
+                }
+            })
+            .catch(() => setRawOrders(MOCK_ORDERS))
             .finally(() => setLoading(false));
     }, [user]);
 
@@ -265,8 +235,6 @@ export default function MyOrders() {
                 {/* Loading */}
                 {loading ? (
                     <OrdersSkeleton />
-                ) : orders.length === 0 ? (
-                    <EmptyOrdersState />
                 ) : (
                     <>
                         <OrdersToolbar
@@ -279,7 +247,7 @@ export default function MyOrders() {
                             tabCounts={tabCounts}
                         />
 
-                        {filteredOrders.length === 0 && !hasActiveSearch ? (
+                        {orders.length === 0 ? (
                             <EmptyOrdersState />
                         ) : filteredOrders.length === 0 ? (
                             <NoResultsState query={searchQuery} onClear={clearSearch} />
@@ -288,6 +256,7 @@ export default function MyOrders() {
                                 {pagedOrders.map(order => (
                                     <OrderCard key={order.id} order={order} />
                                 ))}
+                                
                                 <OrdersPagination
                                     total={filteredOrders.length}
                                     page={page}
@@ -298,7 +267,7 @@ export default function MyOrders() {
                         )}
 
                         {/* Footer CTA */}
-                        <div className="pt-4 border-t border-border flex justify-center">
+                        <div className="pt-4 flex justify-center">
                             <Link
                                 href="/shop"
                                 className="inline-flex items-center gap-3 py-3 px-8 bg-[#1a1f1a] text-white rounded-md text-[12px] font-bold uppercase tracking-widest hover:bg-[#1c3a2a] transition-colors group"

@@ -44,12 +44,12 @@ const STEPS: OrderStatus[] = ['Placed', 'Processing', 'Packing', 'Dispatched', '
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 const STATUS_STYLES: Record<OrderStatus, string> = {
-  Placed:     'bg-gray-100 text-gray-600',
-  Processing: 'bg-amber-100 text-amber-700',
-  Packing:    'bg-blue-100 text-blue-700',
-  Dispatched: 'bg-purple-100 text-purple-700',
-  Delivered:  'bg-teal-100 text-teal-700',
-  Cancelled:  'bg-red-100 text-red-600',
+  Placed:     'bg-gray-100 text-gray-700',
+  Processing: 'bg-amber-100 text-amber-800',
+  Packing:    'bg-blue-100 text-blue-800',
+  Dispatched: 'bg-purple-100 text-purple-800',
+  Delivered:  'bg-teal-100 text-teal-800',
+  Cancelled:  'bg-red-100 text-red-700',
 };
 
 function StatusBadge({ status }: { status: OrderStatus }) {
@@ -86,13 +86,13 @@ function OrderStepper({ status }: { status: OrderStatus }) {
                 className={cn(
                   'w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all',
                   done   ? 'bg-[#1c3a2a] border-[#1c3a2a] text-white'           : '',
-                  active ? 'border-[#1c3a2a] bg-white text-[#1c3a2a] shadow-[0_0_0_3px_rgba(28,58,42,0.12)]' : '',
+                  active ? 'border-[#1c3a2a] bg-white text-[#1c3a2a] ring-2 ring-offset-2 ring-[#1c3a2a] animate-pulse' : '',
                   !done && !active ? 'bg-white border-gray-200 text-gray-300'   : '',
                 )}
               >
                 {done
                   ? <Check size={13} strokeWidth={3} />
-                  : <div className={cn('w-2 h-2 rounded-full', active ? 'bg-[#1c3a2a] animate-pulse' : 'bg-gray-200')} />
+                  : <div className={cn('w-2 h-2 rounded-full', active ? 'bg-[#1c3a2a]' : 'bg-gray-200')} />
                 }
               </div>
               <p className={cn('text-[10px] font-bold uppercase tracking-widest', active ? 'text-[#1c3a2a]' : 'text-gray-400')}>
@@ -137,7 +137,7 @@ export function OrderCard({ order, defaultExpanded = false }: OrderCardProps) {
   };
 
   return (
-    <div className="bg-white border border-border rounded-lg overflow-hidden">
+    <div className="bg-white border border-border rounded-xl overflow-hidden">
       {/* ── Header row ─────────────────────────────────────────────────────── */}
       <div
         className="flex flex-wrap md:flex-nowrap items-center gap-4 p-5 cursor-pointer select-none"
@@ -229,7 +229,7 @@ export function OrderCard({ order, defaultExpanded = false }: OrderCardProps) {
         )}
       >
         <div className="overflow-hidden">
-          <div className="border-t border-border grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-0">
+          <div className="border-t border-border bg-[#f7f6f2] rounded-b-xl grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-0">
 
             {/* Left: Items list */}
             <div className="p-5 space-y-4">

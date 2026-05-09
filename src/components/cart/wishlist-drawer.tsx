@@ -107,7 +107,7 @@ export default function WishlistDrawer() {
                                         <Link
                                             href={`/product/${item.id}`}
                                             onClick={() => setIsOpen(false)}
-                                            className="relative w-20 h-20 rounded-[8px] bg-foreground/5 shrink-0 overflow-hidden"
+                                            className="relative block w-20 h-20 rounded-[8px] bg-foreground/5 shrink-0 overflow-hidden"
                                         >
                                             <Image
                                                 src={item.image}

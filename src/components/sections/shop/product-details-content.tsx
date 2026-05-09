@@ -28,7 +28,7 @@ const ProductDetailsContent = ({ product }: ProductDetailsContentProps) => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
                     {/* Left: Product Image */}
                     <div className="relative group">
-                        <div className="aspect-square bg-[#F5F5F0] rounded-[12px] overflow-hidden flex items-center justify-center p-12">
+                        <div className="relative aspect-square bg-[#F5F5F0] rounded-[12px] overflow-hidden flex items-center justify-center p-12">
                             <Image
                                 src={product.image}
                                 alt={product.name}

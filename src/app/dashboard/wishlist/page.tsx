@@ -2,8 +2,8 @@
 
 import React from 'react';
 import DashboardLayout from '@/components/dashboard/dashboard-layout';
-import { ShoppingBag, Heart, Trash2, ArrowRight, LayoutDashboard, MapPin, User, ShoppingCart } from 'lucide-react';
-import { useWishlist } from '@/contexts/wishlist-context';
+import { Heart, Trash2, ArrowRight, LayoutDashboard, MapPin, User, ShoppingCart, ShoppingBag } from 'lucide-react';
+import { useWishlist, type WishlistItem } from '@/contexts/wishlist-context';
 import { useCart } from '@/contexts/cart-context';
 import { useToast } from '@/components/ui/toast-provider';
 import { cn } from '@/lib/utils';
@@ -23,9 +23,17 @@ export default function WishlistPage() {
     const { addToCart } = useCart();
     const { success } = useToast();
 
-    const handleAddToCart = (product: any) => {
-        addToCart(product);
-        success(`Added ${product.name} to cart`);
+    const handleAddToCart = (item: WishlistItem) => {
+        addToCart({
+            productId: item.id,
+            name: item.name,
+            image: item.image,
+            price: item.price,
+            currency: item.currency,
+            packingType: { name: 'Unit', units: 1, priceMultiplier: 1 },
+            quantity: 1,
+        });
+        success(`Added ${item.name} to cart`);
     };
 
     return (
@@ -47,8 +55,8 @@ export default function WishlistPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {items.map((item: any) => (
-                            <div key={item._id} className="group relative bg-background rounded-2xl border border-foreground/5 p-6 flex items-center gap-6 hover:border-brand-green/20 transition-all">
+                        {items.map((item: WishlistItem) => (
+                            <div key={item.id} className="group relative bg-background rounded-2xl border border-foreground/5 p-6 flex items-center gap-6 hover:border-brand-green/20 transition-all">
                                 <div className="relative w-24 h-24 rounded-xl bg-foreground/5 overflow-hidden p-2 shrink-0">
                                     <Image src={item.image} alt={item.name} fill className="object-contain p-2" />
                                 </div>
@@ -65,7 +73,7 @@ export default function WishlistPage() {
                                             Add to Cart
                                         </button>
                                         <button 
-                                            onClick={() => removeFromWishlist(item._id)}
+                                            onClick={() => removeFromWishlist(item.id)}
                                             className="p-3 border border-foreground/5 rounded-xl hover:bg-red-50 hover:text-red-500 transition-all group/trash"
                                             title="Remove Item"
                                         >

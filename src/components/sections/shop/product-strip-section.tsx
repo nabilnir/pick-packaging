@@ -95,7 +95,7 @@ export default function ProductStripSection({
                         >
                             {/* Image card */}
                             <div className="relative aspect-square rounded-[8px] overflow-hidden bg-foreground/3 mb-4">
-                                <Link href={`/product/${product.id}`}>
+                                <Link href={`/product/${product.id}`} className="relative block w-full h-full">
                                     <Image
                                         src={product.image}
                                         alt={product.name}
