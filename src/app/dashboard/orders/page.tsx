@@ -9,6 +9,8 @@ import {
     Heart,
     MapPin,
     User,
+    SearchX,
+    ChevronLeft,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import Link from 'next/link';
@@ -27,7 +29,9 @@ const USER_NAV = [
     { label: 'Settings',   href: '/dashboard/settings',   icon: User },
 ];
 
-// ─── Transform raw API order → typed Order ────────────────────────────────────
+const PAGE_SIZE = 8;
+
+// ─── Normalise raw API order → typed Order ────────────────────────────────────
 function normalise(raw: any): Order {
     return {
         id:          raw._id,
@@ -35,16 +39,16 @@ function normalise(raw: any): Order {
         date:        raw.createdAt,
         status:      raw.status as OrderStatus,
         totalAmount: raw.totalAmount ?? 0,
-        subtotal:    raw.subtotal   ?? raw.totalAmount * (1 / 1.15) ?? 0,
-        vat:         raw.vat        ?? raw.totalAmount * 0.15 * (1 / 1.15) ?? 0,
+        subtotal:    raw.subtotal    ?? (raw.totalAmount ?? 0) / 1.15,
+        vat:         raw.vat         ?? (raw.totalAmount ?? 0) - (raw.totalAmount ?? 0) / 1.15,
         deliveryFee: raw.deliveryFee ?? 0,
         estimatedDelivery: raw.estimatedDelivery,
         shippingAddress: raw.shippingAddress ?? {
-            fullName: '',
-            line1: raw.address ?? '',
-            city: '',
+            fullName:   '',
+            line1:      raw.address ?? '',
+            city:       '',
             postalCode: '',
-            country: 'South Africa',
+            country:    'South Africa',
         },
         vendor:        raw.vendor,
         paymentMethod: raw.paymentMethod,
@@ -78,9 +82,95 @@ function OrdersSkeleton() {
                             <Skeleton className="h-4 w-16" />
                         </div>
                     </div>
-                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-14 w-full" />
                 </div>
             ))}
+        </div>
+    );
+}
+
+// ─── Empty state (no orders at all) — preserved exactly ──────────────────────
+function EmptyOrdersState() {
+    return (
+        <div className="py-32 text-center rounded-2xl border-2 border-dashed border-foreground/5 bg-foreground/[0.01]">
+            <ShoppingBag className="mx-auto opacity-10 mb-6" size={64} strokeWidth={1} />
+            <p className="opacity-40 font-light italic text-[18px] mb-8 font-display">
+                You haven't placed any orders yet.
+            </p>
+            <Link
+                href="/shop"
+                className="inline-flex items-center gap-2 py-4 px-8 bg-foreground text-background rounded-full text-[13px] font-bold uppercase tracking-widest hover:bg-brand-green transition-all shadow-md group"
+            >
+                Browse Products
+                <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+        </div>
+    );
+}
+
+// ─── No results state (search/filter yields nothing) ─────────────────────────
+function NoResultsState({ query, onClear }: { query: string; onClear: () => void }) {
+    return (
+        <div className="py-24 flex flex-col items-center text-center">
+            <SearchX size={40} className="text-muted-foreground opacity-40 mb-4" />
+            <h3 className="text-base font-medium text-[#1a1f1a] mb-1">No orders found</h3>
+            <p className="text-sm text-muted-foreground mb-6 max-w-xs">
+                {query
+                    ? <>No results for <span className="font-mono font-medium">"{query}"</span>. Try a different search term.</>
+                    : 'No orders match your current filters.'}
+            </p>
+            <button
+                onClick={onClear}
+                className="text-sm font-bold text-[#1c3a2a] underline underline-offset-2 hover:opacity-70 transition-opacity"
+            >
+                Clear {query ? 'search' : 'filters'}
+            </button>
+        </div>
+    );
+}
+
+// ─── Pagination ───────────────────────────────────────────────────────────────
+function OrdersPagination({
+    total, page, pageSize, onChange
+}: { total: number; page: number; pageSize: number; onChange: (p: number) => void }) {
+    const totalPages = Math.ceil(total / pageSize);
+    if (totalPages <= 1) return null;
+
+    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    return (
+        <div className="flex items-center justify-center gap-2 pt-4">
+            <button
+                onClick={() => onChange(page - 1)}
+                disabled={page === 1}
+                className="p-2 rounded-md border border-border bg-white hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label="Previous page"
+            >
+                <ChevronLeft size={16} />
+            </button>
+
+            {pages.map(p => (
+                <button
+                    key={p}
+                    onClick={() => onChange(p)}
+                    className={`w-9 h-9 rounded-md text-sm font-medium transition-colors ${
+                        p === page
+                            ? 'bg-[#1c3a2a] text-white'
+                            : 'border border-border bg-white text-[#1a1f1a] hover:bg-gray-50'
+                    }`}
+                >
+                    {p}
+                </button>
+            ))}
+
+            <button
+                onClick={() => onChange(page + 1)}
+                disabled={page === totalPages}
+                className="p-2 rounded-md border border-border bg-white hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                aria-label="Next page"
+            >
+                <ChevronRight size={16} />
+            </button>
         </div>
     );
 }
@@ -95,6 +185,13 @@ export default function MyOrders() {
     const [activeTab, setActiveTab]     = useState<OrderStatus | 'all'>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [filters, setFilters]         = useState<OrderFilters>({});
+    const [page, setPage]               = useState(1);
+
+    // Reset page to 1 whenever filters change
+    const handleTabChange = (t: OrderStatus | 'all') => { setActiveTab(t); setPage(1); };
+    const handleSearch    = (q: string)               => { setSearchQuery(q); setPage(1); };
+    const handleFilter    = (f: OrderFilters)         => { setFilters(f); setPage(1); };
+    const clearSearch     = ()                        => { setSearchQuery(''); setFilters({}); setActiveTab('all'); setPage(1); };
 
     // ── Fetch ──────────────────────────────────────────────────────────────────
     useEffect(() => {
@@ -119,12 +216,10 @@ export default function MyOrders() {
     }, [orders]);
 
     // ── Filter + search ────────────────────────────────────────────────────────
-    const visible = useMemo(() => {
+    const filteredOrders = useMemo(() => {
         return orders.filter(o => {
-            // Tab
             if (activeTab !== 'all' && o.status !== activeTab) return false;
 
-            // Search (order number or any item name)
             if (searchQuery) {
                 const q = searchQuery.toLowerCase();
                 const matchesNum  = o.orderNumber.toLowerCase().includes(q);
@@ -132,80 +227,78 @@ export default function MyOrders() {
                 if (!matchesNum && !matchesItem) return false;
             }
 
-            // Date range
             const d = new Date(o.date);
             if (filters.dateFrom && d < new Date(filters.dateFrom)) return false;
             if (filters.dateTo   && d > new Date(filters.dateTo))   return false;
-
-            // Amount range
             if (filters.minAmount && o.totalAmount < filters.minAmount) return false;
             if (filters.maxAmount && o.totalAmount > filters.maxAmount) return false;
-
-            // Vendors
             if (filters.vendors?.length && o.vendor && !filters.vendors.includes(o.vendor.name)) return false;
 
             return true;
         });
     }, [orders, activeTab, searchQuery, filters]);
 
+    // ── Paginate ───────────────────────────────────────────────────────────────
+    const pagedOrders = useMemo(() => {
+        const start = (page - 1) * PAGE_SIZE;
+        return filteredOrders.slice(start, start + PAGE_SIZE);
+    }, [filteredOrders, page]);
+
+    const hasActiveSearch = searchQuery !== '' || Object.values(filters).some(v =>
+        Array.isArray(v) ? v.length > 0 : v !== undefined
+    );
+
     return (
         <DashboardLayout items={USER_NAV} title="Order History">
-            <div className="space-y-6 p-6 max-w-[1100px]">
+            <div className="p-6 space-y-6 max-w-[1100px]">
 
                 {/* Page heading */}
-                <div>
-                    <h1 className="text-3xl font-light text-[#1a1f1a]">My Orders</h1>
-                    <p className="text-muted-foreground mt-1 text-[15px] font-light">
-                        Manage and track your purchases.
-                    </p>
+                <div className="flex items-start justify-between">
+                    <div>
+                        <h1 className="text-3xl font-light text-[#1a1f1a]">My Orders</h1>
+                        <p className="text-muted-foreground text-sm mt-1">
+                            Manage and track your recent purchases.
+                        </p>
+                    </div>
                 </div>
 
                 {/* Loading */}
                 {loading ? (
                     <OrdersSkeleton />
                 ) : orders.length === 0 ? (
-                    /* ── Empty state (preserved exactly) ── */
-                    <div className="py-32 text-center rounded-2xl border-2 border-dashed border-foreground/5 bg-foreground/[0.01]">
-                        <ShoppingBag className="mx-auto opacity-10 mb-6" size={64} strokeWidth={1} />
-                        <p className="opacity-40 font-light italic text-[18px] mb-8 font-display">
-                            You haven't placed any orders yet.
-                        </p>
-                        <Link
-                            href="/shop"
-                            className="inline-flex items-center gap-2 py-4 px-8 bg-foreground text-background rounded-full text-[13px] font-bold uppercase tracking-widest hover:bg-brand-green transition-all shadow-md group"
-                        >
-                            Browse Products
-                            <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    </div>
+                    <EmptyOrdersState />
                 ) : (
                     <>
-                        {/* Toolbar: tabs + search + filter drawer */}
                         <OrdersToolbar
                             activeTab={activeTab}
-                            onTabChange={setActiveTab}
+                            onTabChange={handleTabChange}
                             searchQuery={searchQuery}
-                            onSearch={setSearchQuery}
+                            onSearch={handleSearch}
                             filters={filters}
-                            onFilterChange={setFilters}
+                            onFilterChange={handleFilter}
                             tabCounts={tabCounts}
                         />
 
-                        {/* Orders list */}
-                        {visible.length === 0 ? (
-                            <div className="py-16 text-center text-muted-foreground text-sm">
-                                No orders match your current filters.
-                            </div>
+                        {filteredOrders.length === 0 && !hasActiveSearch ? (
+                            <EmptyOrdersState />
+                        ) : filteredOrders.length === 0 ? (
+                            <NoResultsState query={searchQuery} onClear={clearSearch} />
                         ) : (
                             <div className="space-y-4">
-                                {visible.map(order => (
+                                {pagedOrders.map(order => (
                                     <OrderCard key={order.id} order={order} />
                                 ))}
+                                <OrdersPagination
+                                    total={filteredOrders.length}
+                                    page={page}
+                                    pageSize={PAGE_SIZE}
+                                    onChange={setPage}
+                                />
                             </div>
                         )}
 
                         {/* Footer CTA */}
-                        <div className="pt-6 border-t border-border flex justify-center">
+                        <div className="pt-4 border-t border-border flex justify-center">
                             <Link
                                 href="/shop"
                                 className="inline-flex items-center gap-3 py-3 px-8 bg-[#1a1f1a] text-white rounded-md text-[12px] font-bold uppercase tracking-widest hover:bg-[#1c3a2a] transition-colors group"

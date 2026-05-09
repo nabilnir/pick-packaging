@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { CancellationModal } from '@/components/dashboard/orders/CancellationModal';
+import { generateInvoice } from '@/lib/orders/generate-invoice';
 import type { Order, OrderStatus } from '@/types/dashboard';
 
 export interface OrderCardProps {
@@ -132,8 +133,7 @@ export function OrderCard({ order, defaultExpanded = false }: OrderCardProps) {
   };
 
   const handleDownloadInvoice = () => {
-    // Triggers download via API route — adjust path as needed
-    window.open(`/api/orders/${order.id}/invoice`, '_blank');
+    generateInvoice(order).catch(() => toast.error('Failed to generate invoice.'));
   };
 
   return (
