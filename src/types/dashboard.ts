@@ -1,14 +1,9 @@
 // ─── Dashboard shared types ───────────────────────────────────────────────────
-// Used across overview components and mock data.
 
 export interface SpendKpiData {
-  /** Sum of all non-cancelled orders (ZAR) */
   totalLifetimeSpend: number;
-  /** Sum of non-cancelled orders placed in the current calendar month (ZAR) */
   spentThisMonth: number;
-  /** Percentage change vs. last month — positive = up, negative = down */
   spendDeltaPct: number;
-  /** Total number of orders ever placed (all statuses) */
   totalOrdersPlaced: number;
 }
 
@@ -36,13 +31,10 @@ export interface RecentOrderItem {
 }
 
 export interface RecentOrder {
-  /** MongoDB _id or equivalent */
   id: string;
-  /** Human-readable, e.g. "#ORD-992120" */
   orderNumber: string;
   date: string | Date;
   status: OrderStatus;
-  /** Total order value in ZAR */
   totalAmount: number;
   items: RecentOrderItem[];
 }
@@ -55,8 +47,59 @@ export interface WishlistPreview {
 
 export interface Announcement {
   id: string;
-  /** Full message string including any emoji prefix */
   message: string;
-  /** Optional — makes the message a clickable link */
   href?: string;
+}
+
+// ─── Full Order (for /dashboard/orders) ──────────────────────────────────────
+
+export interface OrderLineItem {
+  productId: string;
+  name: string;
+  sku?: string;
+  image: string;
+  price: number;
+  quantity: number;
+  packingType: {
+    name: string;
+    units: number;
+    priceMultiplier: number;
+  };
+  volume?: string;
+}
+
+export interface ShippingAddress {
+  fullName: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  province?: string;
+  postalCode: string;
+  country: string;
+}
+
+export interface Order {
+  /** MongoDB _id or equivalent */
+  id: string;
+  /** Human-readable e.g. "#ORD-992120" */
+  orderNumber: string;
+  date: string | Date;
+  status: OrderStatus;
+  /** Grand total in ZAR */
+  totalAmount: number;
+  /** Pre-tax subtotal */
+  subtotal: number;
+  /** VAT amount (15%) */
+  vat: number;
+  /** Delivery fee */
+  deliveryFee: number;
+  /** ISO date string, optional */
+  estimatedDelivery?: string;
+  shippingAddress: ShippingAddress;
+  vendor?: { name: string; verified: boolean };
+  /** e.g. "EFT", "Credit Card" */
+  paymentMethod?: string;
+  /** e.g. "#TXN-4421" */
+  paymentRef?: string;
+  items: OrderLineItem[];
 }
