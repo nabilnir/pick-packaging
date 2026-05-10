@@ -12,9 +12,8 @@ import { useToast } from '@/components/ui/toast-provider';
 import Link from 'next/link';
 import { WishlistToolbar, type WishlistSort, type WishlistView } from '@/components/dashboard/wishlist/WishlistToolbar';
 import { WishlistCard } from '@/components/dashboard/wishlist/WishlistCard';
-import { WishlistSummaryBar } from '@/components/dashboard/wishlist/WishlistSummaryBar';
 import { PriceAlertBanner } from '@/components/dashboard/wishlist/PriceAlertBanner';
-import { cn } from '@/lib/utils';
+import { WishlistSummaryBar } from '@/components/dashboard/wishlist/WishlistSummaryBar';
 
 // ─── Nav ─────────────────────────────────────────────────────────────────────
 const USER_NAV = [
@@ -78,8 +77,8 @@ export default function WishlistPage() {
 
     // ── Add all → cart ─────────────────────────────────────────────────────────
     const handleAddAll = () => {
-        const inStock  = items.filter(i => (i as any).inStock !== false);
-        const skipped  = items.length - inStock.length;
+        const inStock = items.filter(i => i.inStock !== false);
+        const skipped = items.length - inStock.length;
 
         inStock.forEach(i => addToCart(toCartPayload(i)));
 
@@ -108,18 +107,18 @@ export default function WishlistPage() {
 
     return (
         <DashboardLayout items={USER_NAV} title="Saved Items">
-            <div className="max-w-5xl p-6">
+            <div className="p-6 space-y-5">
 
-                {/* Page heading */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-light text-[#1a1f1a]">My Wishlist</h1>
+                {/* Heading */}
+                <div>
+                    <h1 className="text-3xl font-light">My Wishlist</h1>
                     <p className="text-muted-foreground text-sm mt-1">
                         Products you've saved for later.
                     </p>
                 </div>
 
-                {/* ── Empty state (preserved exactly) ──────────────────────── */}
                 {items.length === 0 ? (
+                    /* ── Empty state (preserved exactly) ─────────────────────── */
                     <div className="py-20 text-center rounded-2xl border-2 border-dashed border-foreground/5">
                         <Heart className="mx-auto opacity-10 mb-4" size={48} />
                         <p className="opacity-40 font-light italic text-[15px]">
@@ -137,7 +136,13 @@ export default function WishlistPage() {
                 ) : (
                     /* ── Populated state ─────────────────────────────────────── */
                     <>
-                        {/* Toolbar: sort · share · add-all · view toggle */}
+                        {/* 1. Price-change alert banners */}
+                        <PriceAlertBanner
+                            priceDropCount={priceDropCount}
+                            priceRiseCount={priceRiseCount}
+                        />
+
+                        {/* 2. Toolbar: count · sort · share · add-all · view toggle */}
                         <WishlistToolbar
                             count={items.length}
                             onAddAll={handleAddAll}
@@ -148,37 +153,37 @@ export default function WishlistPage() {
                             onViewChange={setView}
                         />
 
-                        {/* Summary stats */}
-                        <WishlistSummaryBar items={items} />
+                        {/* 3. Card grid / list */}
+                        {view === 'list' ? (
+                            <div className="flex flex-col gap-3">
+                                {sorted.map(item => (
+                                    <WishlistCard
+                                        key={item.id}
+                                        item={item}
+                                        view="list"
+                                        onAddToCart={handleAddToCart}
+                                        onRemove={removeFromWishlist}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                                {sorted.map(item => (
+                                    <WishlistCard
+                                        key={item.id}
+                                        item={item}
+                                        view="grid"
+                                        onAddToCart={handleAddToCart}
+                                        onRemove={removeFromWishlist}
+                                    />
+                                ))}
+                            </div>
+                        )}
 
-                        {/* Price-change alert banners */}
-                        <PriceAlertBanner
-                            priceDropCount={priceDropCount}
-                            priceRiseCount={priceRiseCount}
-                        />
-
-                        {/* Card grid / list */}
-                        <div className={cn(
-                            'gap-4',
-                            view === 'grid'
-                                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                                : 'flex flex-col'
-                        )}>
-                            {sorted.map(item => (
-                                <WishlistCard
-                                    key={item.id}
-                                    item={item}
-                                    view={view}
-                                    onAddToCart={handleAddToCart}
-                                    onRemove={removeFromWishlist}
-                                />
-                            ))}
-                        </div>
-
-                        {/* Summary footer */}
-                        <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                        {/* 4. Footer */}
+                        <div className="pt-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
                             <p className="text-sm text-muted-foreground">
-                                <span className="font-semibold text-[#1a1f1a]">{items.length}</span>{' '}
+                                <span className="font-semibold text-foreground">{items.length}</span>{' '}
                                 {items.length === 1 ? 'item' : 'items'} saved
                             </p>
                             <Link

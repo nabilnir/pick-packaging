@@ -63,7 +63,7 @@ export function WishlistToolbar({
                     className={cn(
                         'relative inline-flex items-center gap-2 px-4 py-2 rounded-lg',
                         'bg-[#1c3a2a] text-white text-[12px] font-bold uppercase tracking-widest',
-                        'hover:bg-[#16302200] hover:bg-[#243d2e] transition-colors',
+                        'hover:bg-[#243d2e] transition-colors',
                         'disabled:opacity-40 disabled:cursor-not-allowed'
                     )}
                     disabled={count === 0}
