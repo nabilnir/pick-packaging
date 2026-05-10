@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { WishlistToolbar, type WishlistSort, type WishlistView } from '@/components/dashboard/wishlist/WishlistToolbar';
 import { WishlistCard } from '@/components/dashboard/wishlist/WishlistCard';
 import { WishlistSummaryBar } from '@/components/dashboard/wishlist/WishlistSummaryBar';
+import { PriceAlertBanner } from '@/components/dashboard/wishlist/PriceAlertBanner';
 import { cn } from '@/lib/utils';
 
 // ─── Nav ─────────────────────────────────────────────────────────────────────
@@ -58,6 +59,16 @@ export default function WishlistPage() {
     const [view, setView]   = useState<WishlistView>('grid');
 
     const sorted = useMemo(() => sortItems(items, sort), [items, sort]);
+
+    // ── Price-change counts (for banner) ───────────────────────────────────────
+    const priceDropCount = useMemo(
+        () => items.filter(i => i.savedPrice !== undefined && i.savedPrice > i.price).length,
+        [items]
+    );
+    const priceRiseCount = useMemo(
+        () => items.filter(i => i.savedPrice !== undefined && i.savedPrice < i.price).length,
+        [items]
+    );
 
     // ── Single item → cart ─────────────────────────────────────────────────────
     const handleAddToCart = (item: WishlistItem, quantity: number = 1) => {
@@ -139,6 +150,12 @@ export default function WishlistPage() {
 
                         {/* Summary stats */}
                         <WishlistSummaryBar items={items} />
+
+                        {/* Price-change alert banners */}
+                        <PriceAlertBanner
+                            priceDropCount={priceDropCount}
+                            priceRiseCount={priceRiseCount}
+                        />
 
                         {/* Card grid / list */}
                         <div className={cn(
