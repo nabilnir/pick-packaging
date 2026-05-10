@@ -1,89 +1,178 @@
 "use client";
 
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import DashboardLayout from '@/components/dashboard/dashboard-layout';
-import { Heart, Trash2, ArrowRight, LayoutDashboard, MapPin, User, ShoppingCart, ShoppingBag } from 'lucide-react';
+import {
+    Heart, ArrowRight,
+    LayoutDashboard, MapPin, User, ShoppingBag,
+} from 'lucide-react';
 import { useWishlist, type WishlistItem } from '@/contexts/wishlist-context';
 import { useCart } from '@/contexts/cart-context';
 import { useToast } from '@/components/ui/toast-provider';
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
 import Link from 'next/link';
+import {
+    WishlistToolbar,
+    type WishlistSort,
+    type WishlistView,
+} from '@/components/dashboard/wishlist/WishlistToolbar';
+import { WishlistCard } from '@/components/dashboard/wishlist/WishlistCard';
+import { cn } from '@/lib/utils';
 
+// ─── Nav ─────────────────────────────────────────────────────────────────────
 const USER_NAV = [
-    { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-    { label: "My Orders", href: "/dashboard/orders", icon: ShoppingBag },
-    { label: "Wishlist", href: "/dashboard/wishlist", icon: Heart },
-    { label: "Addresses", href: "/dashboard/addresses", icon: MapPin },
-    { label: "Settings", href: "/dashboard/settings", icon: User },
+    { label: 'Overview',  href: '/dashboard',           icon: LayoutDashboard },
+    { label: 'My Orders', href: '/dashboard/orders',    icon: ShoppingBag },
+    { label: 'Wishlist',  href: '/dashboard/wishlist',  icon: Heart },
+    { label: 'Addresses', href: '/dashboard/addresses', icon: MapPin },
+    { label: 'Settings',  href: '/dashboard/settings',  icon: User },
 ];
 
+// ─── Sort helper ──────────────────────────────────────────────────────────────
+function sortItems(items: WishlistItem[], sort: WishlistSort): WishlistItem[] {
+    const copy = [...items];
+    switch (sort) {
+        case 'price-asc':    return copy.sort((a, b) => a.price - b.price);
+        case 'price-desc':   return copy.sort((a, b) => b.price - a.price);
+        case 'alphabetical': return copy.sort((a, b) => a.name.localeCompare(b.name));
+        default:             return copy; // 'recently-saved' = insertion order
+    }
+}
+
+// ─── Cart payload helper ──────────────────────────────────────────────────────
+function toCartPayload(item: WishlistItem) {
+    return {
+        productId:   item.id,
+        name:        item.name,
+        image:       item.image,
+        price:       item.price,
+        currency:    item.currency,
+        packingType: { name: 'Unit', units: 1, priceMultiplier: 1 },
+        quantity:    1,
+    };
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function WishlistPage() {
     const { items, removeFromWishlist } = useWishlist();
     const { addToCart } = useCart();
-    const { success } = useToast();
+    const { success, error: toastError } = useToast();
 
+    const [sort, setSort]   = useState<WishlistSort>('recently-saved');
+    const [view, setView]   = useState<WishlistView>('grid');
+
+    const sorted = useMemo(() => sortItems(items, sort), [items, sort]);
+
+    // ── Single item → cart ─────────────────────────────────────────────────────
     const handleAddToCart = (item: WishlistItem) => {
-        addToCart({
-            productId: item.id,
-            name: item.name,
-            image: item.image,
-            price: item.price,
-            currency: item.currency,
-            packingType: { name: 'Unit', units: 1, priceMultiplier: 1 },
-            quantity: 1,
-        });
-        success(`Added ${item.name} to cart`);
+        addToCart(toCartPayload(item));
+        success(`"${item.name}" added to cart`);
+    };
+
+    // ── Add all → cart ─────────────────────────────────────────────────────────
+    const handleAddAll = () => {
+        const inStock  = items.filter(i => (i as any).inStock !== false);
+        const skipped  = items.length - inStock.length;
+
+        inStock.forEach(i => addToCart(toCartPayload(i)));
+
+        if (skipped > 0) {
+            toastError(
+                `${inStock.length} item${inStock.length !== 1 ? 's' : ''} added, ` +
+                `${skipped} item${skipped !== 1 ? 's' : ''} skipped (out of stock)`
+            );
+        } else {
+            success(`${inStock.length} item${inStock.length !== 1 ? 's' : ''} added to your cart`);
+        }
+    };
+
+    // ── Share wishlist ─────────────────────────────────────────────────────────
+    const handleShare = () => {
+        const ids = items.map(i => i.id).join(',');
+        const url = typeof window !== 'undefined'
+            ? `${window.location.origin}/wishlist/shared?ids=${ids}`
+            : '';
+        if (url && navigator?.clipboard) {
+            navigator.clipboard.writeText(url).then(() => success('Wishlist link copied to clipboard'));
+        } else {
+            success('Wishlist link copied to clipboard');
+        }
     };
 
     return (
         <DashboardLayout items={USER_NAV} title="Saved Items">
-            <div className="max-w-5xl">
-                <div className="mb-12">
-                    <h2 className="text-[2rem] font-light font-display">My Wishlist</h2>
-                    <p className="text-foreground/40 font-light text-[14px]">Products you've saved for later.</p>
+            <div className="max-w-5xl p-6">
+
+                {/* Page heading */}
+                <div className="mb-8">
+                    <h1 className="text-3xl font-light text-[#1a1f1a]">My Wishlist</h1>
+                    <p className="text-muted-foreground text-sm mt-1">
+                        Products you've saved for later.
+                    </p>
                 </div>
 
+                {/* ── Empty state (preserved exactly) ──────────────────────── */}
                 {items.length === 0 ? (
                     <div className="py-20 text-center rounded-2xl border-2 border-dashed border-foreground/5">
                         <Heart className="mx-auto opacity-10 mb-4" size={48} />
-                        <p className="opacity-40 font-light italic text-[15px]">Your wishlist is currently empty.</p>
-                        <Link href="/shop" className="inline-flex items-center gap-2 text-brand-green font-bold uppercase tracking-widest text-[11px] mt-6">
+                        <p className="opacity-40 font-light italic text-[15px]">
+                            Your wishlist is currently empty.
+                        </p>
+                        <Link
+                            href="/shop"
+                            className="inline-flex items-center gap-2 text-brand-green font-bold uppercase tracking-widest text-[11px] mt-6"
+                        >
                             Start Shopping
                             <ArrowRight size={14} />
                         </Link>
                     </div>
+
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {items.map((item: WishlistItem) => (
-                            <div key={item.id} className="group relative bg-background rounded-2xl border border-foreground/5 p-6 flex items-center gap-6 hover:border-brand-green/20 transition-all">
-                                <div className="relative w-24 h-24 rounded-xl bg-foreground/5 overflow-hidden p-2 shrink-0">
-                                    <Image src={item.image} alt={item.name} fill className="object-contain p-2" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h4 className="text-[16px] font-medium truncate mb-1">{item.name}</h4>
-                                    <p className="text-[14px] font-bold mb-4">{item.currency || 'R'}{item.price.toFixed(2)}</p>
-                                    
-                                    <div className="flex items-center gap-3">
-                                        <button 
-                                            onClick={() => handleAddToCart(item)}
-                                            className="flex-1 py-3 bg-foreground text-background rounded-xl text-[11px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-brand-green transition-all"
-                                        >
-                                            <ShoppingCart size={14} />
-                                            Add to Cart
-                                        </button>
-                                        <button 
-                                            onClick={() => removeFromWishlist(item.id)}
-                                            className="p-3 border border-foreground/5 rounded-xl hover:bg-red-50 hover:text-red-500 transition-all group/trash"
-                                            title="Remove Item"
-                                        >
-                                            <Trash2 size={16} className="opacity-40 group-hover/trash:opacity-100" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    /* ── Populated state ─────────────────────────────────────── */
+                    <>
+                        {/* Toolbar: sort · share · add-all · view toggle */}
+                        <WishlistToolbar
+                            count={items.length}
+                            onAddAll={handleAddAll}
+                            onShare={handleShare}
+                            sort={sort}
+                            onSortChange={setSort}
+                            view={view}
+                            onViewChange={setView}
+                        />
+
+                        {/* Card grid / list */}
+                        <div className={cn(
+                            'gap-5',
+                            view === 'grid'
+                                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                                : 'flex flex-col'
+                        )}>
+                            {sorted.map(item => (
+                                <WishlistCard
+                                    key={item.id}
+                                    item={item}
+                                    view={view}
+                                    onAddToCart={handleAddToCart}
+                                    onRemove={removeFromWishlist}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Summary footer */}
+                        <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <p className="text-sm text-muted-foreground">
+                                <span className="font-semibold text-[#1a1f1a]">{items.length}</span>{' '}
+                                {items.length === 1 ? 'item' : 'items'} saved
+                            </p>
+                            <Link
+                                href="/shop"
+                                className="inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-muted-foreground hover:text-[#1c3a2a] transition-colors"
+                            >
+                                Continue Shopping
+                                <ArrowRight size={14} />
+                            </Link>
+                        </div>
+                    </>
                 )}
             </div>
         </DashboardLayout>
