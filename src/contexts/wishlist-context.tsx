@@ -8,9 +8,13 @@ export interface WishlistItem {
     name: string;
     slug: string;
     image: string;
-    price: number;
+    price: number;        // current price
+    savedPrice?: number;  // price at time of saving (for price-change badge)
     currency: string;
     isNew?: boolean;
+    inStock?: boolean;
+    vendor?: string;      // vendor/brand name
+    sku?: string;         // product SKU
 }
 
 interface WishlistContextType {

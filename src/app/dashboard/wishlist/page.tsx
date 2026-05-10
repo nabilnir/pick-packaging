@@ -10,12 +10,9 @@ import { useWishlist, type WishlistItem } from '@/contexts/wishlist-context';
 import { useCart } from '@/contexts/cart-context';
 import { useToast } from '@/components/ui/toast-provider';
 import Link from 'next/link';
-import {
-    WishlistToolbar,
-    type WishlistSort,
-    type WishlistView,
-} from '@/components/dashboard/wishlist/WishlistToolbar';
+import { WishlistToolbar, type WishlistSort, type WishlistView } from '@/components/dashboard/wishlist/WishlistToolbar';
 import { WishlistCard } from '@/components/dashboard/wishlist/WishlistCard';
+import { WishlistSummaryBar } from '@/components/dashboard/wishlist/WishlistSummaryBar';
 import { cn } from '@/lib/utils';
 
 // ─── Nav ─────────────────────────────────────────────────────────────────────
@@ -39,7 +36,7 @@ function sortItems(items: WishlistItem[], sort: WishlistSort): WishlistItem[] {
 }
 
 // ─── Cart payload helper ──────────────────────────────────────────────────────
-function toCartPayload(item: WishlistItem) {
+function toCartPayload(item: WishlistItem, quantity = 1) {
     return {
         productId:   item.id,
         name:        item.name,
@@ -47,7 +44,7 @@ function toCartPayload(item: WishlistItem) {
         price:       item.price,
         currency:    item.currency,
         packingType: { name: 'Unit', units: 1, priceMultiplier: 1 },
-        quantity:    1,
+        quantity,
     };
 }
 
@@ -63,9 +60,9 @@ export default function WishlistPage() {
     const sorted = useMemo(() => sortItems(items, sort), [items, sort]);
 
     // ── Single item → cart ─────────────────────────────────────────────────────
-    const handleAddToCart = (item: WishlistItem) => {
-        addToCart(toCartPayload(item));
-        success(`"${item.name}" added to cart`);
+    const handleAddToCart = (item: WishlistItem, quantity: number = 1) => {
+        addToCart(toCartPayload(item, quantity));
+        success(`${quantity > 1 ? `${quantity}× ` : ''}"${item.name}" added to cart`);
     };
 
     // ── Add all → cart ─────────────────────────────────────────────────────────
@@ -140,11 +137,14 @@ export default function WishlistPage() {
                             onViewChange={setView}
                         />
 
+                        {/* Summary stats */}
+                        <WishlistSummaryBar items={items} />
+
                         {/* Card grid / list */}
                         <div className={cn(
-                            'gap-5',
+                            'gap-4',
                             view === 'grid'
-                                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
                                 : 'flex flex-col'
                         )}>
                             {sorted.map(item => (
