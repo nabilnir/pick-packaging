@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Lock, Loader2, Check } from 'lucide-react';
+import { Lock, Loader2, ChevronsUpDown, Check } from 'lucide-react';
 import {
     Sheet,
     SheetContent,
@@ -13,15 +13,21 @@ import {
     SheetFooter,
 } from '@/components/ui/sheet';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from '@/components/ui/command';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
-import { Address, AddressType } from '@/types/addresses';
+import type { Address, AddressType, AddressPayload } from '@/types/addresses';
 
 // ─── SA Provinces ─────────────────────────────────────────────────────────────
 const PROVINCES = [
@@ -34,27 +40,43 @@ const PROVINCES = [
     'North West',
     'Northern Cape',
     'Western Cape',
-];
+] as const;
 
-// ─── Zod Schema ───────────────────────────────────────────────────────────────
-const addressSchema = z.object({
-    fullName: z.string().min(1, 'Full name is required'),
-    companyName: z.string().optional(),
-    phone: z.string().optional().refine((val) => {
-        if (!val) return true;
-        // Basic SA phone validation: +27 followed by 9 digits
-        return /^\+27\s\d{2}\s\d{3}\s\d{4}$/.test(val) || /^\+27\d{9}$/.test(val);
-    }, 'Invalid SA format (e.g. +27 XX XXX XXXX)'),
-    streetLine1: z.string().min(1, 'Street address is required'),
-    streetLine2: z.string().optional(),
-    city: z.string().min(1, 'City is required'),
-    province: z.string().min(1, 'Province is required'),
-    postalCode: z.string().length(4, 'Postal code must be exactly 4 digits'),
-    type: z.enum(['SHIPPING', 'BILLING', 'BOTH'] as const),
-    isPrimary: z.boolean().default(false),
+// Postal code → city mock (replace with real API call)
+const POSTAL_CITY_MAP: Record<string, string> = {
+    '8001': 'Cape Town',
+    '8000': 'Cape Town',
+    '2000': 'Johannesburg',
+    '2001': 'Johannesburg',
+    '4001': 'Durban',
+    '4000': 'Durban',
+    '0001': 'Pretoria',
+    '0002': 'Pretoria',
+    '7500': 'Stellenbosch',
+    '6001': 'Port Elizabeth',
+};
+
+// ─── Zod schema ───────────────────────────────────────────────────────────────
+const schema = z.object({
+    fullName:   z.string().min(1, 'Full name is required'),
+    company:    z.string().optional(),
+    phone:      z
+        .string()
+        .optional()
+        .refine(
+            (v) => !v || /^\+27\s?\d{2}\s?\d{3}\s?\d{4}$/.test(v),
+            'Use SA format: +27 XX XXX XXXX',
+        ),
+    line1:      z.string().min(1, 'Street address is required'),
+    line2:      z.string().optional(),
+    city:       z.string().min(1, 'City is required'),
+    province:   z.string().min(1, 'Province is required'),
+    postalCode: z.string().regex(/^\d{4}$/, 'Must be exactly 4 digits'),
+    type:       z.enum(['shipping', 'billing', 'both'] as const),
+    isPrimary:  z.boolean().default(false),
 });
 
-type AddressFormData = z.infer<typeof addressSchema>;
+type FormData = z.infer<typeof schema>;
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface AddressFormProps {
@@ -62,296 +84,306 @@ interface AddressFormProps {
     initialData?: Address | null;
     open: boolean;
     onClose: () => void;
-    onSave: (data: any) => void;
+    onSave: (data: AddressPayload) => void;
 }
 
-export function AddressForm({
-    mode,
-    initialData,
-    open,
-    onClose,
-    onSave,
-}: AddressFormProps) {
-    const [fetchingCity, setFetchingCity] = useState(false);
+// ─── Reusable field wrapper ───────────────────────────────────────────────────
+function Field({
+    label,
+    error,
+    children,
+}: {
+    label: string;
+    error?: string;
+    children: React.ReactNode;
+}) {
+    return (
+        <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 block">
+                {label}
+            </label>
+            {children}
+            {error && <p className="text-[11px] text-red-500 font-medium">{error}</p>}
+        </div>
+    );
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+export function AddressForm({ mode, initialData, open, onClose, onSave }: AddressFormProps) {
+    const [provinceOpen, setProvinceOpen] = useState(false);
+    const [lookingUpCity, setLookingUpCity] = useState(false);
 
     const {
         register,
         handleSubmit,
+        control,
         reset,
         setValue,
         getValues,
         watch,
         formState: { errors, isDirty, isValid },
-    } = useForm<AddressFormData>({
-        resolver: zodResolver(addressSchema),
+    } = useForm<FormData>({
+        resolver: zodResolver(schema),
         mode: 'onBlur',
         defaultValues: {
-            fullName: '',
-            companyName: '',
-            phone: '',
-            streetLine1: '',
-            streetLine2: '',
-            city: '',
-            province: '',
+            fullName:   '',
+            company:    '',
+            phone:      '',
+            line1:      '',
+            line2:      '',
+            city:       '',
+            province:   '',
             postalCode: '',
-            type: 'SHIPPING',
-            isPrimary: false,
+            type:       'shipping',
+            isPrimary:  false,
         },
     });
 
-    // Reset form when initialData changes or modal opens
+    const watchType     = watch('type');
+    const watchProvince = watch('province');
+    const watchPrimary  = watch('isPrimary');
+
+    // Sync form when sheet opens / initialData changes
     useEffect(() => {
-        if (open) {
-            if (mode === 'edit' && initialData) {
-                reset({
-                    fullName: initialData.fullName,
-                    companyName: initialData.companyName || '',
-                    phone: initialData.phone || '',
-                    streetLine1: initialData.streetLine1,
-                    streetLine2: initialData.streetLine2 || '',
-                    city: initialData.city,
-                    province: initialData.province,
-                    postalCode: initialData.postalCode,
-                    type: initialData.type,
-                    isPrimary: initialData.isPrimary,
-                });
-            } else {
-                reset({
-                    fullName: '',
-                    companyName: '',
-                    phone: '',
-                    streetLine1: '',
-                    streetLine2: '',
-                    city: '',
-                    province: '',
-                    postalCode: '',
-                    type: 'SHIPPING',
-                    isPrimary: false,
-                });
-            }
+        if (!open) return;
+        if (mode === 'edit' && initialData) {
+            reset({
+                fullName:   initialData.fullName,
+                company:    initialData.company   ?? '',
+                phone:      initialData.phone     ?? '',
+                line1:      initialData.line1,
+                line2:      initialData.line2     ?? '',
+                city:       initialData.city,
+                province:   initialData.province,
+                postalCode: initialData.postalCode,
+                type:       initialData.type,
+                isPrimary:  initialData.isPrimary,
+            });
+        } else {
+            reset({
+                fullName: '', company: '', phone: '',
+                line1: '', line2: '', city: '', province: '',
+                postalCode: '', type: 'shipping', isPrimary: false,
+            });
         }
     }, [open, mode, initialData, reset]);
 
-    const watchType = watch('type');
-    const watchProvince = watch('province');
+    // ── Postal code auto-fill city ────────────────────────────────────────────
+    const handlePostalBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+        register('postalCode').onBlur(e); // trigger RHF blur validation
+        const code = e.target.value.trim();
+        if (code.length !== 4) return;
+        if (getValues('city')) return; // don't overwrite
 
-    // ─── Postal Code Lookup ──────────────────────────────────────────────────
-    const handlePostalCodeBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
-        const code = e.target.value;
-        if (code.length === 4 && !getValues('city')) {
-            setFetchingCity(true);
-            // Mock API lookup
-            setTimeout(() => {
-                const mockMap: Record<string, string> = {
-                    '8001': 'Cape Town',
-                    '2000': 'Johannesburg',
-                    '4001': 'Durban',
-                    '0001': 'Pretoria',
-                };
-                if (mockMap[code]) {
-                    setValue('city', mockMap[code], { shouldValidate: true });
-                }
-                setFetchingCity(false);
-            }, 600);
-        }
+        setLookingUpCity(true);
+        // Simulate API latency; swap with real call when ready
+        await new Promise(r => setTimeout(r, 500));
+        const city = POSTAL_CITY_MAP[code];
+        if (city) setValue('city', city, { shouldValidate: true });
+        setLookingUpCity(false);
     };
 
-    const onSubmit = (data: AddressFormData) => {
-        onSave(data);
+    const onSubmit = (data: FormData) => {
+        onSave({ ...data, country: 'South Africa' } as AddressPayload);
     };
+
+    const inputCls = (hasError?: boolean) =>
+        cn(
+            'w-full px-4 py-2.5 rounded-lg border bg-background text-sm transition-all outline-none',
+            'placeholder:text-muted-foreground/40',
+            hasError
+                ? 'border-red-400 focus:border-red-500'
+                : 'border-border focus:border-[#1c3a2a]',
+        );
 
     return (
-        <Sheet open={open} onOpenChange={(val) => !val && onClose()}>
-            <SheetContent className="sm:max-w-[480px] p-0 flex flex-col">
-                <SheetHeader className="p-6 border-b border-border">
+        <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+            {/* 480px wide, full width on mobile */}
+            <SheetContent
+                side="right"
+                className="w-[480px] max-w-full p-0 flex flex-col gap-0"
+            >
+                {/* Header */}
+                <SheetHeader className="px-6 py-5 border-b border-border shrink-0">
                     <SheetTitle className="text-2xl font-light">
                         {mode === 'add' ? 'Add new address' : 'Edit address'}
                     </SheetTitle>
                 </SheetHeader>
 
-                <div className="flex-1 overflow-y-auto p-6 scroll-smooth">
-                    <form id="address-form" className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                        {/* Full Name */}
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                Full name
-                            </label>
+                {/* Scrollable body */}
+                <div className="flex-1 overflow-y-auto px-6 py-6">
+                    <form id="address-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                        {/* Full name */}
+                        <Field label="Full name" error={errors.fullName?.message}>
                             <input
                                 {...register('fullName')}
-                                className={cn(
-                                    "w-full px-4 py-2.5 rounded-lg border border-border bg-background focus:border-[#1c3a2a] outline-none transition-all text-sm",
-                                    errors.fullName && "border-red-500 focus:border-red-500"
-                                )}
+                                className={inputCls(!!errors.fullName)}
                                 placeholder="Enter full name"
                             />
-                            {errors.fullName && <p className="text-[11px] text-red-500 font-medium">{errors.fullName.message}</p>}
-                        </div>
+                        </Field>
 
-                        {/* Company Name */}
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                Company / Business name (optional)
-                            </label>
+                        {/* Company */}
+                        <Field label="Company / Business name (optional)">
                             <input
-                                {...register('companyName')}
-                                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background focus:border-[#1c3a2a] outline-none transition-all text-sm"
-                                placeholder="Enter company name"
+                                {...register('company')}
+                                className={inputCls()}
+                                placeholder="e.g. Acme (Pty) Ltd"
                             />
-                        </div>
+                        </Field>
 
-                        {/* Phone Number */}
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                Phone number (optional)
-                            </label>
+                        {/* Phone */}
+                        <Field label="Phone number (optional)" error={errors.phone?.message}>
                             <input
                                 {...register('phone')}
-                                className={cn(
-                                    "w-full px-4 py-2.5 rounded-lg border border-border bg-background focus:border-[#1c3a2a] outline-none transition-all text-sm",
-                                    errors.phone && "border-red-500 focus:border-red-500"
-                                )}
+                                className={inputCls(!!errors.phone)}
                                 placeholder="+27 XX XXX XXXX"
+                                inputMode="tel"
                             />
-                            {errors.phone && <p className="text-[11px] text-red-500 font-medium">{errors.phone.message}</p>}
-                        </div>
+                        </Field>
 
-                        {/* Address Line 1 */}
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                Address line 1
-                            </label>
+                        {/* Line 1 */}
+                        <Field label="Address line 1" error={errors.line1?.message}>
                             <input
-                                {...register('streetLine1')}
-                                className={cn(
-                                    "w-full px-4 py-2.5 rounded-lg border border-border bg-background focus:border-[#1c3a2a] outline-none transition-all text-sm",
-                                    errors.streetLine1 && "border-red-500 focus:border-red-500"
-                                )}
+                                {...register('line1')}
+                                className={inputCls(!!errors.line1)}
                                 placeholder="Street address or P.O. box"
                             />
-                            {errors.streetLine1 && <p className="text-[11px] text-red-500 font-medium">{errors.streetLine1.message}</p>}
-                        </div>
+                        </Field>
 
-                        {/* Address Line 2 */}
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                Address line 2 (optional)
-                            </label>
+                        {/* Line 2 */}
+                        <Field label="Address line 2 (optional)">
                             <input
-                                {...register('streetLine2')}
-                                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background focus:border-[#1c3a2a] outline-none transition-all text-sm"
+                                {...register('line2')}
+                                className={inputCls()}
                                 placeholder="Apt, suite, unit, building"
                             />
-                        </div>
+                        </Field>
 
-                        {/* City & Province Row */}
+                        {/* City & Province */}
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                    City
-                                </label>
+                            <Field label="City" error={errors.city?.message}>
                                 <div className="relative">
                                     <input
                                         {...register('city')}
-                                        className={cn(
-                                            "w-full px-4 py-2.5 rounded-lg border border-border bg-background focus:border-[#1c3a2a] outline-none transition-all text-sm",
-                                            errors.city && "border-red-500 focus:border-red-500"
-                                        )}
+                                        className={inputCls(!!errors.city)}
                                         placeholder="City"
                                     />
-                                    {fetchingCity && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 size-4 animate-spin text-muted-foreground" />}
+                                    {lookingUpCity && (
+                                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 size-4 animate-spin text-muted-foreground/50" />
+                                    )}
                                 </div>
-                                {errors.city && <p className="text-[11px] text-red-500 font-medium">{errors.city.message}</p>}
-                            </div>
-                            <div className="space-y-1.5">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                    Province
-                                </label>
-                                <Select
-                                    value={watchProvince}
-                                    onValueChange={(val) => setValue('province', val, { shouldValidate: true, shouldDirty: true })}
-                                >
-                                    <SelectTrigger className={cn("w-full h-[42px] border-border", errors.province && "border-red-500")}>
-                                        <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {PROVINCES.map((p) => (
-                                            <SelectItem key={p} value={p}>{p}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.province && <p className="text-[11px] text-red-500 font-medium">{errors.province.message}</p>}
-                            </div>
+                            </Field>
+
+                            {/* Province — searchable Popover + Command */}
+                            <Field label="Province" error={errors.province?.message}>
+                                <Popover open={provinceOpen} onOpenChange={setProvinceOpen}>
+                                    <PopoverTrigger asChild>
+                                        <button
+                                            type="button"
+                                            role="combobox"
+                                            aria-expanded={provinceOpen}
+                                            className={cn(
+                                                inputCls(!!errors.province),
+                                                'flex items-center justify-between text-left',
+                                                !watchProvince && 'text-muted-foreground/40',
+                                            )}
+                                        >
+                                            {watchProvince || 'Select province'}
+                                            <ChevronsUpDown className="size-4 opacity-40 shrink-0 ml-1" />
+                                        </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[200px] p-0" align="start">
+                                        <Command>
+                                            <CommandInput placeholder="Search..." className="h-9" />
+                                            <CommandList>
+                                                <CommandEmpty>No province found.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {PROVINCES.map((p) => (
+                                                        <CommandItem
+                                                            key={p}
+                                                            value={p}
+                                                            onSelect={() => {
+                                                                setValue('province', p, {
+                                                                    shouldValidate: true,
+                                                                    shouldDirty: true,
+                                                                });
+                                                                setProvinceOpen(false);
+                                                            }}
+                                                        >
+                                                            {p}
+                                                            {watchProvince === p && (
+                                                                <Check className="ml-auto size-4 text-[#1c3a2a]" />
+                                                            )}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </Field>
                         </div>
 
-                        {/* Postal Code & Country Row */}
+                        {/* Postal code & Country */}
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                    Postal code
-                                </label>
+                            <Field label="Postal code" error={errors.postalCode?.message}>
                                 <input
                                     {...register('postalCode')}
-                                    onBlur={(e) => {
-                                        register('postalCode').onBlur(e);
-                                        handlePostalCodeBlur(e);
-                                    }}
-                                    className={cn(
-                                        "w-full px-4 py-2.5 rounded-lg border border-border bg-background focus:border-[#1c3a2a] outline-none transition-all text-sm",
-                                        errors.postalCode && "border-red-500 focus:border-red-500"
-                                    )}
+                                    onBlur={handlePostalBlur}
+                                    className={inputCls(!!errors.postalCode)}
                                     placeholder="4-digit code"
+                                    inputMode="numeric"
                                     maxLength={4}
                                 />
-                                {errors.postalCode && <p className="text-[11px] text-red-500 font-medium">{errors.postalCode.message}</p>}
-                            </div>
-                            <div className="space-y-1.5">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                    Country
-                                </label>
+                            </Field>
+
+                            <Field label="Country">
                                 <div className="relative">
                                     <input
                                         disabled
                                         value="South Africa"
-                                        className="w-full px-4 py-2.5 rounded-lg border border-border bg-muted/30 text-muted-foreground text-sm cursor-not-allowed pr-10"
+                                        className={cn(
+                                            inputCls(),
+                                            'bg-muted/40 text-muted-foreground cursor-not-allowed pr-9',
+                                        )}
                                     />
-                                    <Lock className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 opacity-30" />
+                                    <Lock className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 opacity-25" />
                                 </div>
-                            </div>
+                            </Field>
                         </div>
 
-                        {/* Address Type (Segmented Control) */}
-                        <div className="space-y-3">
-                            <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                Address type
-                            </label>
-                            <div className="flex p-1 bg-muted/50 rounded-xl border border-border">
-                                {(['SHIPPING', 'BILLING', 'BOTH'] as AddressType[]).map((type) => (
+                        {/* Address type — segmented control */}
+                        <Field label="Address type">
+                            <div className="flex p-1 rounded-xl border border-border bg-muted/30">
+                                {(['shipping', 'billing', 'both'] as AddressType[]).map((t) => (
                                     <button
-                                        key={type}
+                                        key={t}
                                         type="button"
-                                        onClick={() => setValue('type', type, { shouldDirty: true })}
+                                        onClick={() =>
+                                            setValue('type', t, { shouldDirty: true })
+                                        }
                                         className={cn(
-                                            "flex-1 py-2 text-[12px] font-semibold rounded-lg transition-all",
-                                            watchType === type
-                                                ? "bg-white text-[#1c3a2a] shadow-sm"
-                                                : "text-muted-foreground hover:text-foreground"
+                                            'flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all',
+                                            watchType === t
+                                                ? 'bg-white text-[#1c3a2a] shadow-sm'
+                                                : 'text-muted-foreground hover:text-foreground',
                                         )}
                                     >
-                                        {type === 'BOTH' ? 'Both' : type.charAt(0) + type.slice(1).toLowerCase()}
+                                        {t === 'both' ? 'Both' : t.charAt(0).toUpperCase() + t.slice(1)}
                                     </button>
                                 ))}
                             </div>
-                        </div>
+                        </Field>
 
-                        {/* Set as primary address */}
+                        {/* Primary checkbox */}
                         <label className="flex items-center gap-3 cursor-pointer group w-fit select-none">
-                            <div className="relative flex items-center">
-                                <Checkbox
-                                    checked={watch('isPrimary')}
-                                    onCheckedChange={(checked) => setValue('isPrimary', !!checked, { shouldDirty: true })}
-                                    className="border-border data-[state=checked]:bg-[#1c3a2a] data-[state=checked]:border-[#1c3a2a]"
-                                />
-                            </div>
+                            <Checkbox
+                                checked={watchPrimary}
+                                onCheckedChange={(v) =>
+                                    setValue('isPrimary', !!v, { shouldDirty: true })
+                                }
+                                className="border-border data-[state=checked]:bg-[#1c3a2a] data-[state=checked]:border-[#1c3a2a]"
+                            />
                             <span className="text-[13px] font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                                 Set as primary address
                             </span>
@@ -359,17 +391,18 @@ export function AddressForm({
                     </form>
                 </div>
 
-                <SheetFooter className="p-6 border-t border-border bg-muted/10 sticky bottom-0">
-                    <div className="flex flex-col gap-3 w-full">
+                {/* Sticky footer */}
+                <SheetFooter className="px-6 py-5 border-t border-border bg-muted/10 shrink-0 sticky bottom-0">
+                    <div className="flex flex-col gap-2 w-full">
                         <button
-                            form="address-form"
                             type="submit"
+                            form="address-form"
                             disabled={!isDirty || !isValid}
                             className={cn(
-                                "w-full py-3 rounded-full text-[12px] font-bold uppercase tracking-widest transition-all",
+                                'w-full py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all',
                                 isDirty && isValid
-                                    ? "bg-[#1c3a2a] text-white hover:bg-[#152d20] shadow-sm"
-                                    : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
+                                    ? 'bg-[#1c3a2a] text-white hover:bg-[#152d20] shadow-sm'
+                                    : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50',
                             )}
                         >
                             Save address
@@ -377,7 +410,7 @@ export function AddressForm({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="w-full py-3 rounded-full text-[12px] font-bold uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition-all"
+                            className="w-full py-3 rounded-full text-xs font-bold uppercase tracking-widest text-muted-foreground hover:bg-muted/60 transition-all"
                         >
                             Cancel
                         </button>

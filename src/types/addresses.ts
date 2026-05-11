@@ -1,18 +1,22 @@
-export type AddressType = 'SHIPPING' | 'BILLING' | 'BOTH';
+// ─── Address Type ─────────────────────────────────────────────────────────────
+export type AddressType = 'shipping' | 'billing' | 'both';
 
+// ─── Full Address (persisted) ─────────────────────────────────────────────────
 export interface Address {
-    _id: string;
-    userEmail: string;
+    id: string;
     fullName: string;
-    companyName?: string;
-    streetLine1: string;
-    streetLine2?: string;
+    company?: string;
+    phone?: string;
+    line1: string;
+    line2?: string;
     city: string;
     province: string;
     postalCode: string;
-    country: string; // "South Africa"
-    phone?: string;
+    country: string; // Always "South Africa" for now
     type: AddressType;
     isPrimary: boolean;
-    orderCount?: number; // Used for deletion warning
+    usedInOrderCount: number;
 }
+
+// ─── Payload for create / update ─────────────────────────────────────────────
+export type AddressPayload = Omit<Address, 'id' | 'usedInOrderCount'>;

@@ -1,92 +1,85 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/dashboard/dashboard-layout';
-import { ShoppingBag, Heart, MapPin, User, LayoutDashboard, Plus } from 'lucide-react';
-import { useCart } from '@/contexts/cart-context';
+import { ShoppingBag, Heart, MapPin, User, LayoutDashboard } from 'lucide-react';
 import { useToast } from '@/components/ui/toast-provider';
+import { Button } from '@/components/ui/button';
 import { AddressCard } from '@/components/dashboard/addresses/AddressCard';
 import { AddressForm } from '@/components/dashboard/addresses/AddressForm';
-import { Address, AddressType } from '@/types/addresses';
+import type { Address, AddressType, AddressPayload } from '@/types/addresses';
 import { MOCK_ADDRESSES } from '@/lib/addresses/mock-addresses';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
+// ─── Nav ─────────────────────────────────────────────────────────────────────
 const USER_NAV = [
-    { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-    { label: "My Orders", href: "/dashboard/orders", icon: ShoppingBag },
-    { label: "Wishlist", href: "/dashboard/wishlist", icon: Heart },
-    { label: "Addresses", href: "/dashboard/addresses", icon: MapPin },
-    { label: "Settings", href: "/dashboard/settings", icon: User },
+    { label: 'Overview',   href: '/dashboard',           icon: LayoutDashboard },
+    { label: 'My Orders',  href: '/dashboard/orders',    icon: ShoppingBag },
+    { label: 'Wishlist',   href: '/dashboard/wishlist',  icon: Heart },
+    { label: 'Addresses',  href: '/dashboard/addresses', icon: MapPin },
+    { label: 'Settings',   href: '/dashboard/settings',  icon: User },
 ];
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function AddressesPage() {
     const { success } = useToast();
-    
-    // State
-    const [addresses, setAddresses] = useState<Address[]>(MOCK_ADDRESSES);
-    const [sheetOpen, setSheetOpen] = useState(false);
-    const [sheetMode, setSheetMode] = useState<'add' | 'edit'>('add');
+    const [addresses, setAddresses]         = useState<Address[]>(MOCK_ADDRESSES);
+    const [sheetOpen, setSheetOpen]         = useState(false);
+    const [sheetMode, setSheetMode]         = useState<'add' | 'edit'>('add');
     const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
-    // ─── Sheet Handlers ───────────────────────────────────────────────────────
+    // ── Sheet helpers ──────────────────────────────────────────────────────────
     const openSheet = (mode: 'add' | 'edit', address?: Address) => {
         setSheetMode(mode);
-        setEditingAddress(address || null);
+        setEditingAddress(address ?? null);
         setSheetOpen(true);
     };
-
     const closeSheet = () => {
         setSheetOpen(false);
         setEditingAddress(null);
     };
 
-    // ─── Action Handlers ──────────────────────────────────────────────────────
-    const handleSave = (data: any) => {
+    // ── Save (add or edit) ─────────────────────────────────────────────────────
+    const handleSave = (payload: AddressPayload) => {
         if (sheetMode === 'edit' && editingAddress) {
-            setAddresses(prev => prev.map(a => 
-                a._id === editingAddress._id ? { ...a, ...data } as Address : a
-            ));
+            setAddresses(prev =>
+                prev.map(a => a.id === editingAddress.id ? { ...a, ...payload } : a)
+            );
             success('Address updated');
         } else {
-            const newAddress: Address = {
-                ...data,
-                _id: `addr-${Date.now()}`,
-                orderCount: 0,
-                country: 'South Africa',
+            const created: Address = {
+                ...payload,
+                id: `addr-${Date.now()}`,
+                usedInOrderCount: 0,
             };
-            
-            if (newAddress.isPrimary) {
+            if (created.isPrimary) {
                 setAddresses(prev => [
                     ...prev.map(a => ({ ...a, isPrimary: false })),
-                    newAddress
+                    created,
                 ]);
             } else {
-                setAddresses(prev => [...prev, newAddress]);
+                setAddresses(prev => [...prev, created]);
             }
             success('Address saved');
         }
         closeSheet();
     };
 
+    // ── Delete ─────────────────────────────────────────────────────────────────
     const handleDelete = (address: Address) => {
-        setAddresses(prev => prev.filter(a => a._id !== address._id));
+        setAddresses(prev => prev.filter(a => a.id !== address.id));
         success('Address deleted');
     };
 
+    // ── Set primary ────────────────────────────────────────────────────────────
     const handleSetPrimary = (id: string) => {
-        setAddresses(prev => prev.map(a => ({
-            ...a,
-            isPrimary: a._id === id
-        })));
+        setAddresses(prev => prev.map(a => ({ ...a, isPrimary: a.id === id })));
         success('Primary address updated');
     };
 
+    // ── Set type ───────────────────────────────────────────────────────────────
     const handleSetType = (id: string, type: AddressType) => {
-        setAddresses(prev => prev.map(a => 
-            a._id === id ? { ...a, type } : a
-        ));
-        success(`Address type updated to ${type.toLowerCase()}`);
+        setAddresses(prev => prev.map(a => a.id === id ? { ...a, type } : a));
+        success(`Address set as ${type}`);
     };
 
     return (
@@ -100,49 +93,51 @@ export default function AddressesPage() {
                             Manage your shipping and billing locations.
                         </p>
                     </div>
-                    <Button 
+                    <Button
                         onClick={() => openSheet('add')}
                         className="bg-[#1c3a2a] text-white hover:bg-[#152d20] uppercase tracking-widest text-xs rounded-full px-5 h-11"
                     >
-                        + ADD NEW ADDRESS
+                        + Add new address
                     </Button>
                 </div>
 
                 {addresses.length === 0 ? (
-                    /* Existing Empty State */
+                    /* Empty State (preserved) */
                     <div className="py-20 text-center rounded-2xl border border-dashed border-foreground/10 bg-foreground/[0.01]">
                         <MapPin className="mx-auto opacity-20 mb-4" size={48} />
-                        <p className="opacity-60 text-[15px] mb-6 font-light">You haven't saved any addresses yet.</p>
-                        <Button 
+                        <p className="text-muted-foreground text-[15px] mb-6 font-light">
+                            You haven't saved any addresses yet.
+                        </p>
+                        <Button
                             variant="ghost"
                             onClick={() => openSheet('add')}
-                            className="text-[#1c3a2a] font-bold uppercase tracking-widest text-[12px] hover:bg-transparent"
+                            className="text-[#1c3a2a] font-bold uppercase tracking-widest text-xs hover:bg-transparent"
                         >
-                            Add Your First Address
+                            Add your first address
                         </Button>
                     </div>
                 ) : (
-                    /* Populated State */
+                    /* Populated grid */
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {addresses.map((addr) => (
-                            <AddressCard 
-                                key={addr._id}
+                        {addresses.map(addr => (
+                            <AddressCard
+                                key={addr.id}
                                 address={addr}
                                 onEdit={() => openSheet('edit', addr)}
                                 onDelete={() => handleDelete(addr)}
-                                onSetPrimary={() => handleSetPrimary(addr._id)}
-                                onSetType={(type) => handleSetType(addr._id, type)}
+                                onSetPrimary={() => handleSetPrimary(addr.id)}
+                                onSetType={(type) => handleSetType(addr.id, type)}
                             />
                         ))}
                     </div>
                 )}
 
-                {/* Form Drawer */}
-                <AddressForm 
-                    mode={sheetMode} 
+                {/* Sheet drawer */}
+                <AddressForm
+                    mode={sheetMode}
                     initialData={editingAddress}
-                    open={sheetOpen} 
-                    onClose={closeSheet} 
+                    open={sheetOpen}
+                    onClose={closeSheet}
                     onSave={handleSave}
                 />
             </div>
