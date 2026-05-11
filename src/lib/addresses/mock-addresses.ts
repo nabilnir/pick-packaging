@@ -1,0 +1,48 @@
+import { Address } from '@/types/addresses';
+
+export const MOCK_ADDRESSES: Address[] = [
+    {
+        _id: 'addr-1',
+        userEmail: 'user@example.com',
+        fullName: 'John Doe',
+        companyName: 'Tech Solutions Pty Ltd',
+        streetLine1: '123 Innovation Drive',
+        streetLine2: 'Block B, Suite 4',
+        city: 'Cape Town',
+        province: 'Western Cape',
+        postalCode: '8001',
+        country: 'South Africa',
+        phone: '+27 21 555 0123',
+        type: 'BOTH',
+        isPrimary: true,
+        orderCount: 12,
+    },
+    {
+        _id: 'addr-2',
+        userEmail: 'user@example.com',
+        fullName: 'John Doe',
+        streetLine1: '45 Residential Way',
+        city: 'Johannesburg',
+        province: 'Gauteng',
+        postalCode: '2000',
+        country: 'South Africa',
+        phone: '+27 11 555 9876',
+        type: 'SHIPPING',
+        isPrimary: false,
+        orderCount: 0,
+    },
+    {
+        _id: 'addr-3',
+        userEmail: 'user@example.com',
+        fullName: 'Jane Doe',
+        companyName: 'Creative Studio',
+        streetLine1: '88 Art Street',
+        city: 'Durban',
+        province: 'KwaZulu-Natal',
+        postalCode: '4001',
+        country: 'South Africa',
+        type: 'BILLING',
+        isPrimary: false,
+        orderCount: 5,
+    }
+];
