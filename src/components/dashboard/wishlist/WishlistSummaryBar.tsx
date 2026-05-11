@@ -3,7 +3,7 @@
 import React from 'react';
 import { TrendingDown, PackageCheck, PackageX, BadgePercent } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { WishlistItem } from '@/contexts/wishlist-context';
+import { type WishlistItem, getPriceDirection } from '@/types/wishlist';
 
 interface WishlistSummaryBarProps {
     items: WishlistItem[];
@@ -17,21 +17,19 @@ export function WishlistSummaryBar({ items }: WishlistSummaryBarProps) {
     if (items.length === 0) return null;
 
     // Totals
-    const totalValue   = items.reduce((s, i) => s + i.price, 0);
-    const inStockCount = items.filter(i => i.inStock !== false).length;
+    const totalValue   = items.reduce((s, i) => s + i.currentPrice, 0);
+    const inStockCount = items.filter(i => i.inStock).length;
     const oosCount     = items.length - inStockCount;
 
     // Savings: sum of (savedPrice - currentPrice) where price has dropped
     const savings = items.reduce((s, i) => {
-        if (i.savedPrice !== undefined && i.savedPrice > i.price) {
-            return s + (i.savedPrice - i.price);
+        if (getPriceDirection(i) === 'dropped') {
+            return s + (i.savedPrice - i.currentPrice);
         }
         return s;
     }, 0);
 
-    const priceDropCount = items.filter(
-        i => i.savedPrice !== undefined && i.savedPrice > i.price
-    ).length;
+    const priceDropCount = items.filter(i => getPriceDirection(i) === 'dropped').length;
 
     const stats = [
         {

@@ -6,14 +6,15 @@ import {
     Heart, ArrowRight,
     LayoutDashboard, MapPin, User, ShoppingBag,
 } from 'lucide-react';
-import { useWishlist, type WishlistItem } from '@/contexts/wishlist-context';
 import { useCart } from '@/contexts/cart-context';
 import { useToast } from '@/components/ui/toast-provider';
 import Link from 'next/link';
-import { WishlistToolbar, type WishlistSort, type WishlistView } from '@/components/dashboard/wishlist/WishlistToolbar';
+import { WishlistToolbar, type WishlistView } from '@/components/dashboard/wishlist/WishlistToolbar';
 import { WishlistCard } from '@/components/dashboard/wishlist/WishlistCard';
 import { PriceAlertBanner } from '@/components/dashboard/wishlist/PriceAlertBanner';
 import { WishlistSummaryBar } from '@/components/dashboard/wishlist/WishlistSummaryBar';
+import { type WishlistItem, type WishlistSort, getPriceDirection } from '@/types/wishlist';
+import { MOCK_WISHLIST } from '@/lib/wishlist/mock-wishlist';
 
 // ─── Nav ─────────────────────────────────────────────────────────────────────
 const USER_NAV = [
@@ -24,25 +25,25 @@ const USER_NAV = [
     { label: 'Settings',  href: '/dashboard/settings',  icon: User },
 ];
 
-// ─── Sort helper ──────────────────────────────────────────────────────────────
+// ─── Sort ─────────────────────────────────────────────────────────────────────
 function sortItems(items: WishlistItem[], sort: WishlistSort): WishlistItem[] {
     const copy = [...items];
     switch (sort) {
-        case 'price-asc':    return copy.sort((a, b) => a.price - b.price);
-        case 'price-desc':   return copy.sort((a, b) => b.price - a.price);
-        case 'alphabetical': return copy.sort((a, b) => a.name.localeCompare(b.name));
-        default:             return copy; // 'recently-saved' = insertion order
+        case 'price-asc':    return copy.sort((a, b) => a.currentPrice - b.currentPrice);
+        case 'price-desc':   return copy.sort((a, b) => b.currentPrice - a.currentPrice);
+        case 'alphabetical': return copy.sort((a, b) => a.productName.localeCompare(b.productName));
+        default:             return copy; // recently-saved = insertion order
     }
 }
 
-// ─── Cart payload helper ──────────────────────────────────────────────────────
-function toCartPayload(item: WishlistItem, quantity = 1) {
+// ─── Cart payload ─────────────────────────────────────────────────────────────
+function toCartPayload(item: WishlistItem, quantity: number) {
     return {
-        productId:   item.id,
-        name:        item.name,
-        image:       item.image,
-        price:       item.price,
-        currency:    item.currency,
+        productId:   item.productId,
+        name:        item.productName,
+        image:       item.imageUrl,
+        price:       item.currentPrice,
+        currency:    'R',
         packingType: { name: 'Unit', units: 1, priceMultiplier: 1 },
         quantity,
     };
@@ -50,38 +51,42 @@ function toCartPayload(item: WishlistItem, quantity = 1) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function WishlistPage() {
-    const { items, removeFromWishlist } = useWishlist();
+    // In production: replace MOCK_WISHLIST with a real API/context call
+    const [items, setItems] = useState<WishlistItem[]>(MOCK_WISHLIST);
     const { addToCart } = useCart();
     const { success, error: toastError } = useToast();
 
-    const [sort, setSort]   = useState<WishlistSort>('recently-saved');
-    const [view, setView]   = useState<WishlistView>('grid');
+    const [sort, setSort] = useState<WishlistSort>('recently-saved');
+    const [view, setView] = useState<WishlistView>('grid');
 
     const sorted = useMemo(() => sortItems(items, sort), [items, sort]);
 
-    // ── Price-change counts (for banner) ───────────────────────────────────────
+    // Price-change counts for banners
     const priceDropCount = useMemo(
-        () => items.filter(i => i.savedPrice !== undefined && i.savedPrice > i.price).length,
-        [items]
+        () => items.filter(i => getPriceDirection(i) === 'dropped').length,
+        [items],
     );
     const priceRiseCount = useMemo(
-        () => items.filter(i => i.savedPrice !== undefined && i.savedPrice < i.price).length,
-        [items]
+        () => items.filter(i => getPriceDirection(i) === 'risen').length,
+        [items],
     );
 
-    // ── Single item → cart ─────────────────────────────────────────────────────
-    const handleAddToCart = (item: WishlistItem, quantity: number = 1) => {
-        addToCart(toCartPayload(item, quantity));
-        success(`${quantity > 1 ? `${quantity}× ` : ''}"${item.name}" added to cart`);
+    // ── Handlers ───────────────────────────────────────────────────────────────
+    const handleRemove = (id: string) => {
+        setItems(prev => prev.filter(i => i.id !== id));
     };
 
-    // ── Add all → cart ─────────────────────────────────────────────────────────
+    const handleAddToCart = (item: WishlistItem, quantity: number) => {
+        addToCart(toCartPayload(item, quantity));
+        success(
+            `${quantity > 1 ? `${quantity}× ` : ''}"${item.productName}" added to cart`
+        );
+    };
+
     const handleAddAll = () => {
-        const inStock = items.filter(i => i.inStock !== false);
-        const skipped = items.length - inStock.length;
-
-        inStock.forEach(i => addToCart(toCartPayload(i)));
-
+        const inStock  = items.filter(i => i.inStock);
+        const skipped  = items.length - inStock.length;
+        inStock.forEach(i => addToCart(toCartPayload(i, i.quantity)));
         if (skipped > 0) {
             toastError(
                 `${inStock.length} item${inStock.length !== 1 ? 's' : ''} added, ` +
@@ -92,16 +97,12 @@ export default function WishlistPage() {
         }
     };
 
-    // ── Share wishlist ─────────────────────────────────────────────────────────
     const handleShare = () => {
-        const ids = items.map(i => i.id).join(',');
         const url = typeof window !== 'undefined'
-            ? `${window.location.origin}/wishlist/shared?ids=${ids}`
+            ? `${window.location.origin}/wishlist/shared?ids=${items.map(i => i.productId).join(',')}`
             : '';
         if (url && navigator?.clipboard) {
-            navigator.clipboard.writeText(url).then(() => success('Wishlist link copied to clipboard'));
-        } else {
-            success('Wishlist link copied to clipboard');
+            navigator.clipboard.writeText(url).then(() => success('Wishlist link copied'));
         }
     };
 
@@ -118,7 +119,7 @@ export default function WishlistPage() {
                 </div>
 
                 {items.length === 0 ? (
-                    /* ── Empty state (preserved exactly) ─────────────────────── */
+                    /* ── Empty state ──────────────────────────────────────────── */
                     <div className="py-20 text-center rounded-2xl border-2 border-dashed border-foreground/5">
                         <Heart className="mx-auto opacity-10 mb-4" size={48} />
                         <p className="opacity-40 font-light italic text-[15px]">
@@ -134,15 +135,15 @@ export default function WishlistPage() {
                     </div>
 
                 ) : (
-                    /* ── Populated state ─────────────────────────────────────── */
+                    /* ── Populated state ──────────────────────────────────────── */
                     <>
-                        {/* 1. Price-change alert banners */}
+                        {/* 1. Price-change banners */}
                         <PriceAlertBanner
                             priceDropCount={priceDropCount}
                             priceRiseCount={priceRiseCount}
                         />
 
-                        {/* 2. Toolbar: count · sort · share · add-all · view toggle */}
+                        {/* 2. Toolbar */}
                         <WishlistToolbar
                             count={items.length}
                             onAddAll={handleAddAll}
@@ -153,7 +154,10 @@ export default function WishlistPage() {
                             onViewChange={setView}
                         />
 
-                        {/* 3. Card grid / list */}
+                        {/* 3. Summary stat tiles */}
+                        <WishlistSummaryBar items={items} />
+
+                        {/* 4. Cards — grid rows for equal height */}
                         {view === 'list' ? (
                             <div className="flex flex-col gap-3">
                                 {sorted.map(item => (
@@ -162,25 +166,25 @@ export default function WishlistPage() {
                                         item={item}
                                         view="list"
                                         onAddToCart={handleAddToCart}
-                                        onRemove={removeFromWishlist}
+                                        onRemove={handleRemove}
                                     />
                                 ))}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 items-start">
                                 {sorted.map(item => (
                                     <WishlistCard
                                         key={item.id}
                                         item={item}
                                         view="grid"
                                         onAddToCart={handleAddToCart}
-                                        onRemove={removeFromWishlist}
+                                        onRemove={handleRemove}
                                     />
                                 ))}
                             </div>
                         )}
 
-                        {/* 4. Footer */}
+                        {/* 5. Footer */}
                         <div className="pt-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
                             <p className="text-sm text-muted-foreground">
                                 <span className="font-semibold text-foreground">{items.length}</span>{' '}
