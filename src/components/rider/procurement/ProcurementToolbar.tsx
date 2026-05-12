@@ -10,48 +10,50 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
-import type { PickupStatus, VendorPickup } from '@/types/procurement';
+import type { FilterStatus, PickupOrder } from '@/types/procurement';
 
-// ─── Props ────────────────────────────────────────────────────────────────────
-export type FilterStatus = 'ALL' | PickupStatus;
+// ─── All filter options ───────────────────────────────────────────────────────
+const FILTERS: FilterStatus[] = ['ALL', 'ASSIGNED', 'CONFIRMED', 'EN_ROUTE', 'COLLECTED', 'MISSED'];
 
-interface ProcurementToolbarProps {
-    pickups: VendorPickup[];
-    filter: FilterStatus;
-    onFilterChange: (f: FilterStatus) => void;
-    selectedDate: Date;
-    onDateChange: (d: Date) => void;
-}
-
-// ─── Filter pill definitions ──────────────────────────────────────────────────
-const FILTERS: FilterStatus[] = ['ALL', 'PENDING', 'CONFIRMED', 'COLLECTED'];
+const FILTER_LABEL: Record<FilterStatus, string> = {
+    ALL:       'All',
+    ASSIGNED:  'Assigned',
+    CONFIRMED: 'Confirmed',
+    EN_ROUTE:  'En Route',
+    COLLECTED: 'Collected',
+    MISSED:    'Missed',
+};
 
 const PILL_ACTIVE: Record<FilterStatus, string> = {
     ALL:       'bg-[#1a1f1a] text-white',
-    PENDING:   'bg-amber-500 text-white',
-    CONFIRMED: 'bg-blue-600 text-white',
-    COLLECTED: 'bg-teal-600 text-white',
+    ASSIGNED:  'bg-gray-600 text-white',
+    CONFIRMED: 'bg-teal-600 text-white',
+    EN_ROUTE:  'bg-amber-500 text-white',
+    COLLECTED: 'bg-[#1c3a2a] text-white',
+    MISSED:    'bg-red-600 text-white',
 };
 
-const PILL_BADGE: Record<FilterStatus, string> = {
-    ALL:       'bg-white/20',
-    PENDING:   'bg-white/25',
-    CONFIRMED: 'bg-white/25',
-    COLLECTED: 'bg-white/25',
-};
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-function countFor(pickups: VendorPickup[], filter: FilterStatus): number {
-    if (filter === 'ALL') return pickups.length;
-    return pickups.filter(p => p.status === filter).length;
+// ─── Props ────────────────────────────────────────────────────────────────────
+interface ProcurementToolbarProps {
+    orders:         PickupOrder[];
+    filter:         FilterStatus;
+    onFilterChange: (f: FilterStatus) => void;
+    selectedDate:   Date;
+    onDateChange:   (d: Date) => void;
 }
 
-/** Returns pickups whose windowEnd is within the next 30 min from now */
-function closingSoon(pickups: VendorPickup[]): VendorPickup[] {
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function countFor(orders: PickupOrder[], filter: FilterStatus): number {
+    if (filter === 'ALL') return orders.length;
+    return orders.filter(o => o.status === filter).length;
+}
+
+/** ASSIGNED or CONFIRMED orders whose windowEnd is within 30 min from now */
+function closingSoon(orders: PickupOrder[]): PickupOrder[] {
     const now = new Date();
-    return pickups.filter(p => {
-        if (p.status !== 'PENDING') return false;
-        const [h, m] = p.windowEnd.split(':').map(Number);
+    return orders.filter(o => {
+        if (o.status !== 'ASSIGNED' && o.status !== 'CONFIRMED') return false;
+        const [h, m] = o.windowEnd.split(':').map(Number);
         const end = new Date(now);
         end.setHours(h, m, 0, 0);
         const diffMin = (end.getTime() - now.getTime()) / 60_000;
@@ -61,44 +63,39 @@ function closingSoon(pickups: VendorPickup[]): VendorPickup[] {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function ProcurementToolbar({
-    pickups,
+    orders,
     filter,
     onFilterChange,
     selectedDate,
     onDateChange,
 }: ProcurementToolbarProps) {
     const [calOpen, setCalOpen] = useState(false);
-    const soonPickups = closingSoon(pickups);
+    const soonOrders = closingSoon(orders);
 
     const dateLabel = isToday(selectedDate)
         ? `Today, ${format(selectedDate, 'd MMM')}`
         : format(selectedDate, 'EEE d MMM');
 
-    // Earliest closing windowEnd among soon-closing pickups
-    const urgentTime = soonPickups.length > 0
-        ? soonPickups.reduce((earliest, p) =>
-            p.windowEnd < earliest ? p.windowEnd : earliest,
-            soonPickups[0].windowEnd
-        )
+    const urgentTime = soonOrders.length > 0
+        ? soonOrders.reduce((earliest, o) =>
+            o.windowEnd < earliest ? o.windowEnd : earliest,
+            soonOrders[0].windowEnd,
+          )
         : null;
 
     return (
         <div className="space-y-3">
-            {/* ── Main toolbar row ────────────────────────────────────── */}
-            <div className="flex items-center justify-between gap-3 flex-wrap">
+            {/* ── Toolbar row ─────────────────────────────────────────── */}
+            <div className="flex items-start justify-between gap-3 flex-wrap">
 
                 {/* Date picker */}
                 <Popover open={calOpen} onOpenChange={setCalOpen}>
                     <PopoverTrigger asChild>
                         <button
                             id="procurement-date-trigger"
-                            className={cn(
-                                'flex items-center gap-2 px-4 py-2.5 rounded-xl border border-foreground/10',
-                                'bg-background text-foreground hover:border-foreground/20 transition-all',
-                                'text-[13px] font-semibold tracking-wide active:scale-95',
-                            )}
+                            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-foreground/10 bg-background text-foreground hover:border-foreground/20 transition-all text-[13px] font-semibold tracking-wide active:scale-95 shrink-0"
                         >
-                            <CalendarIcon size={15} className="text-foreground/50" />
+                            <CalendarIcon size={15} className="text-foreground/45" />
                             {dateLabel}
                         </button>
                     </PopoverTrigger>
@@ -114,15 +111,17 @@ export function ProcurementToolbar({
                     </PopoverContent>
                 </Popover>
 
-                {/* Filter pills */}
+                {/* Filter pills — scrollable on mobile */}
                 <div className="flex items-center gap-1.5 flex-wrap">
                     {FILTERS.map((f) => {
                         const active = f === filter;
-                        const count  = countFor(pickups, f);
+                        const count  = countFor(orders, f);
+                        // Skip empty non-ALL filters to reduce clutter
+                        if (!active && count === 0 && f !== 'ALL') return null;
                         return (
                             <button
                                 key={f}
-                                id={`procurement-filter-${f.toLowerCase()}`}
+                                id={`procurement-filter-${f.toLowerCase().replace('_', '-')}`}
                                 onClick={() => onFilterChange(f)}
                                 className={cn(
                                     'flex items-center gap-1.5 px-3 py-1.5 rounded-full',
@@ -133,13 +132,10 @@ export function ProcurementToolbar({
                                         : 'border border-foreground/10 bg-background text-foreground/50 hover:border-foreground/25 hover:text-foreground',
                                 )}
                             >
-                                {f}
-                                {/* Count badge */}
+                                {FILTER_LABEL[f]}
                                 <span className={cn(
                                     'min-w-[18px] h-[18px] rounded-full flex items-center justify-center text-[9px] font-black px-1',
-                                    active
-                                        ? PILL_BADGE[f]
-                                        : 'bg-foreground/8 text-foreground/60',
+                                    active ? 'bg-white/20' : 'bg-foreground/8 text-foreground/55',
                                 )}>
                                     {count}
                                 </span>
@@ -149,14 +145,14 @@ export function ProcurementToolbar({
                 </div>
             </div>
 
-            {/* ── Closing-soon banner ──────────────────────────────────── */}
-            {soonPickups.length > 0 && (
+            {/* ── Closing-soon amber banner ────────────────────────────── */}
+            {soonOrders.length > 0 && (
                 <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-amber-50 border border-amber-200">
                     <AlertTriangle size={14} className="text-amber-600 shrink-0" />
                     <p className="text-[12px] font-semibold text-amber-800 leading-snug">
-                        {soonPickups.length === 1
-                            ? `1 pickup window closing soon — confirm before ${urgentTime}`
-                            : `${soonPickups.length} pickup windows closing soon — confirm before ${urgentTime}`
+                        {soonOrders.length === 1
+                            ? `⚠ 1 pickup window closing soon — confirm before ${urgentTime}`
+                            : `⚠ ${soonOrders.length} pickup windows closing soon — confirm before ${urgentTime}`
                         }
                     </p>
                 </div>
