@@ -1,0 +1,78 @@
+import type { VendorPickup } from '@/types/procurement';
+
+export const MOCK_PICKUPS: VendorPickup[] = [
+    {
+        id: 'pu-001',
+        orderRef: 'ORD-9241',
+        vendorName: 'PackMaster SA',
+        vendorAddress: '14 Industrial Ave, Epping, Cape Town',
+        contactPhone: '+27 21 555 0101',
+        status: 'PENDING',
+        windowStart: '08:30',
+        windowEnd: '10:00',
+        estimatedWeight: 22.5,
+        notes: 'Ring buzzer at gate B. Ask for Thabo.',
+        items: [
+            { sku: 'KPM-250350', description: 'Kraft Paper Mailer 250×350mm', qty: 200, unitWeight: 0.05 },
+            { sku: 'BWR-1000-50', description: 'Bubble Wrap Roll 1000×50m', qty: 2,   unitWeight: 6.25 },
+        ],
+    },
+    {
+        id: 'pu-002',
+        orderRef: 'ORD-9244',
+        vendorName: 'BoxCo Industries',
+        vendorAddress: '88 Paarden Eiland Rd, Cape Town',
+        contactPhone: '+27 21 555 0202',
+        status: 'CONFIRMED',
+        windowStart: '09:00',
+        windowEnd: '10:30',
+        estimatedWeight: 48.0,
+        items: [
+            { sku: 'CBA4-SW',   description: 'Corrugated Box A4 Single-Wall', qty: 150, unitWeight: 0.28 },
+            { sku: 'CEP-50',    description: 'Cardboard Edge Protectors 50mm', qty: 60,  unitWeight: 0.12 },
+        ],
+    },
+    {
+        id: 'pu-003',
+        orderRef: 'ORD-9247',
+        vendorName: 'WrapRight',
+        vendorAddress: '3 Montague Gardens, Cape Town',
+        contactPhone: '+27 21 555 0303',
+        status: 'PENDING',
+        windowStart: '10:00',
+        windowEnd: '11:30',
+        estimatedWeight: 14.0,
+        notes: 'Parcel is pre-palletised. Bring own strapping.',
+        items: [
+            { sku: 'SWF-500300', description: 'Stretch Wrap Film 500mm×300m', qty: 4, unitWeight: 3.5 },
+        ],
+    },
+    {
+        id: 'pu-004',
+        orderRef: 'ORD-9251',
+        vendorName: 'LabelTech',
+        vendorAddress: '21 Airport Industria, Cape Town',
+        contactPhone: '+27 21 555 0404',
+        status: 'COLLECTED',
+        windowStart: '07:00',
+        windowEnd: '08:30',
+        estimatedWeight: 8.8,
+        items: [
+            { sku: 'TLR-100150', description: 'Thermal Label Roll 100×150mm', qty: 20, unitWeight: 0.44 },
+        ],
+    },
+    {
+        id: 'pu-005',
+        orderRef: 'ORD-9255',
+        vendorName: 'StrapSafe',
+        vendorAddress: '7 Voortrekker Rd, Bellville',
+        contactPhone: '+27 21 555 0505',
+        status: 'PENDING',
+        windowStart: '11:00',
+        windowEnd: '12:00',
+        estimatedWeight: 31.2,
+        items: [
+            { sku: 'PSB-12MM', description: 'Polypropylene Strapping Band 12mm', qty: 12, unitWeight: 2.6 },
+        ],
+    },
+];

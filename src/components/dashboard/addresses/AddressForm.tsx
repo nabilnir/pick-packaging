@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Lock, Loader2, ChevronsUpDown, Check } from 'lucide-react';
@@ -116,7 +116,6 @@ export function AddressForm({ mode, initialData, open, onClose, onSave }: Addres
     const {
         register,
         handleSubmit,
-        control,
         reset,
         setValue,
         getValues,
@@ -170,13 +169,11 @@ export function AddressForm({ mode, initialData, open, onClose, onSave }: Addres
 
     // ── Postal code auto-fill city ────────────────────────────────────────────
     const handlePostalBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
-        register('postalCode').onBlur(e); // trigger RHF blur validation
         const code = e.target.value.trim();
         if (code.length !== 4) return;
-        if (getValues('city')) return; // don't overwrite
+        if (getValues('city')) return; // don't overwrite an existing entry
 
         setLookingUpCity(true);
-        // Simulate API latency; swap with real call when ready
         await new Promise(r => setTimeout(r, 500));
         const city = POSTAL_CITY_MAP[code];
         if (city) setValue('city', city, { shouldValidate: true });
@@ -327,14 +324,22 @@ export function AddressForm({ mode, initialData, open, onClose, onSave }: Addres
                         {/* Postal code & Country */}
                         <div className="grid grid-cols-2 gap-4">
                             <Field label="Postal code" error={errors.postalCode?.message}>
-                                <input
-                                    {...register('postalCode')}
-                                    onBlur={handlePostalBlur}
-                                    className={inputCls(!!errors.postalCode)}
-                                    placeholder="4-digit code"
-                                    inputMode="numeric"
-                                    maxLength={4}
-                                />
+                                {(() => {
+                                    const { onBlur: rhfBlur, ...postalReg } = register('postalCode');
+                                    return (
+                                        <input
+                                            {...postalReg}
+                                            onBlur={async (e) => {
+                                                await rhfBlur(e);        // RHF validation
+                                                await handlePostalBlur(e); // city lookup
+                                            }}
+                                            className={inputCls(!!errors.postalCode)}
+                                            placeholder="4-digit code"
+                                            inputMode="numeric"
+                                            maxLength={4}
+                                        />
+                                    );
+                                })()}
                             </Field>
 
                             <Field label="Country">
