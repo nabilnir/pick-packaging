@@ -23,11 +23,13 @@ import { MISS_REASONS } from '@/types/procurement';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 export interface PickupCardProps {
-    order:      PickupOrder;
-    onConfirm:  (id: string) => void;
-    onArrive:   (id: string) => void;
-    onCollect:  (id: string) => void;
-    onMiss:     (id: string, reason: MissReason) => void;
+    order:         PickupOrder;
+    onConfirm:     (id: string) => void;
+    onArrive:      (id: string) => void;
+    onCollect:     (id: string) => void;
+    onMiss:        (id: string, reason: MissReason) => void;
+    /** Opens the CollectionVerifySheet for this order */
+    onOpenVerify:  (order: PickupOrder) => void;
 }
 
 // ─── Status config ────────────────────────────────────────────────────────────
@@ -167,7 +169,7 @@ function MissDialog({
 }
 
 // ─── Main PickupCard ──────────────────────────────────────────────────────────
-export function PickupCard({ order, onConfirm, onArrive, onCollect, onMiss }: PickupCardProps) {
+export function PickupCard({ order, onConfirm, onArrive, onCollect, onMiss, onOpenVerify }: PickupCardProps) {
     const { success } = useToast();
     const [expanded,  setExpanded]  = useState(false);
     const [missOpen,  setMissOpen]  = useState(false);
@@ -384,7 +386,7 @@ export function PickupCard({ order, onConfirm, onArrive, onCollect, onMiss }: Pi
                         {order.status === 'EN_ROUTE' && (
                             <button
                                 disabled={acting}
-                                onClick={() => act(() => onCollect(order.id), 'Collection recorded!')}
+                                onClick={() => onOpenVerify(order)}
                                 className="w-full py-3 rounded-xl bg-[#1c3a2a] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-[#152d20] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                             >
                                 {acting && <Loader2 size={13} className="animate-spin" />}
