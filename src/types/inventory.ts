@@ -1,17 +1,26 @@
 // ─── Inventory Item (one physical SKU on the vehicle) ─────────────────────────
 export type DeliveryStatus = 'LOADED' | 'DELIVERED' | 'FAILED';
+export type InventoryStatus = 'PENDING' | 'PARTIAL' | 'COMPLETE' | 'RETURN';
+export type ItemCondition = 'GOOD' | 'DAMAGED' | 'PARTIALLY_DAMAGED';
 
 export interface InventoryItem {
     id:          string;
     poNumber:    string;          // links back to a pickup order
     sku:         string;
     productName: string;
-    qtyLoaded:   number;
+    productImage?: string;
+    vendorName:  string;
+    qtyOrdered:  number;          // what was originally expected
+    qtyLoaded:   number;          // what was actually collected
     qtyDelivered:number;
     unitWeightKg:number;
-    recipient:   string;         // buyer company name
+    recipient:   string;         // primary buyer company name
+    destinations: string[];      // list of company names this item goes to
     deliveryAddress: string;
     status:      DeliveryStatus;
+    invStatus:   InventoryStatus;
+    condition:   ItemCondition;
+    damagedCount?: number;
     deliveredAt?: string;        // ISO timestamp
     failureNote?: string;
 }
