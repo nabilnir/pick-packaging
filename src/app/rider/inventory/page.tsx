@@ -1,20 +1,24 @@
 "use client";
 
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import RiderLayout from '@/components/rider/rider-layout';
 import { LoadSummaryBar } from '@/components/rider/inventory/LoadSummaryBar';
 import { ManifestList } from '@/components/rider/inventory/ManifestList';
+import { DamageReportSheet } from '@/components/rider/inventory/DamageReportSheet';
 import { MOCK_INVENTORY, MOCK_VEHICLE } from '@/lib/inventory/mock-inventory';
+import { InventoryItem, DamageReport } from '@/types/inventory';
 
 export default function InventoryPage() {
+    const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>(MOCK_INVENTORY);
+    const [reportingItem, setReportingItem] = useState<InventoryItem | null>(null);
+
     // ─── Stats Calculation ───────────────────────────────────────────────────
     const stats = useMemo(() => {
-        const loaded    = MOCK_INVENTORY.filter(i => i.status !== 'DELIVERED' && i.status !== 'FAILED').length;
-        const delivered = MOCK_INVENTORY.filter(i => i.status === 'DELIVERED').length;
-        const remaining = MOCK_INVENTORY.filter(i => i.invStatus === 'PENDING' || i.invStatus === 'PARTIAL').length;
+        const loaded    = inventoryItems.filter(i => i.status !== 'DELIVERED' && i.status !== 'FAILED').length;
+        const delivered = inventoryItems.filter(i => i.status === 'DELIVERED').length;
+        const remaining = inventoryItems.filter(i => i.invStatus === 'PENDING' || i.invStatus === 'PARTIAL').length;
         
-        const currentWeightKg = MOCK_INVENTORY.reduce((acc, item) => {
-            // Only count items currently on the vehicle (not delivered or failed)
+        const currentWeightKg = inventoryItems.reduce((acc, item) => {
             if (item.status === 'LOADED') {
                 return acc + (item.qtyLoaded * item.unitWeightKg);
             }
@@ -22,9 +26,25 @@ export default function InventoryPage() {
         }, 0);
 
         return { loaded, delivered, remaining, currentWeightKg };
-    }, []);
+    }, [inventoryItems]);
 
     const subtitle = `${stats.loaded} items loaded · ${stats.delivered} delivered · ${stats.remaining} remaining`;
+
+    // ─── Handlers ─────────────────────────────────────────────────────────────
+    const handleDamageSubmit = (itemId: string, report: DamageReport) => {
+        setInventoryItems(prev => prev.map(item => {
+            if (item.id === itemId) {
+                const newCondition = report.qtyAffected === item.qtyLoaded ? 'DAMAGED' : 'PARTIALLY_DAMAGED';
+                return {
+                    ...item,
+                    condition: newCondition,
+                    damagedCount: (item.damagedCount || 0) + report.qtyAffected,
+                    damageReports: [...(item.damageReports || []), report]
+                };
+            }
+            return item;
+        }));
+    };
 
     return (
         <RiderLayout>
@@ -60,8 +80,19 @@ export default function InventoryPage() {
                             Current Manifest
                         </h2>
                     </div>
-                    <ManifestList items={MOCK_INVENTORY} />
+                    <ManifestList 
+                        items={inventoryItems} 
+                        onReportDamage={(item) => setReportingItem(item)}
+                    />
                 </div>
+
+                {/* ── Damage Report Sheet ─────────────────────────────────────── */}
+                <DamageReportSheet 
+                    item={reportingItem}
+                    open={!!reportingItem}
+                    onClose={() => setReportingItem(null)}
+                    onSubmit={handleDamageSubmit}
+                />
 
                 {/* ── Footer Stats ────────────────────────────────────────────── */}
                 <div className="mt-12 pt-6 border-t border-foreground/5 flex flex-col sm:flex-row items-center justify-between gap-4">

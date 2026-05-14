@@ -3,6 +3,22 @@ export type DeliveryStatus = 'LOADED' | 'DELIVERED' | 'FAILED';
 export type InventoryStatus = 'PENDING' | 'PARTIAL' | 'COMPLETE' | 'RETURN';
 export type ItemCondition = 'GOOD' | 'DAMAGED' | 'PARTIALLY_DAMAGED';
 
+export type DamageType = 'Crushed' | 'Wet damage' | 'Torn packaging' | 'Missing labels' | 'Contamination' | 'Other';
+export type DamageSeverity = 'Minor' | 'Moderate' | 'Severe';
+export type DamageResponsibility = 'Vendor' | 'In transit' | 'Unknown';
+
+export interface DamageReport {
+    id: string;
+    itemId: string;
+    type: DamageType;
+    qtyAffected: number;
+    severity: DamageSeverity;
+    description?: string;
+    photoDataUrl?: string;
+    responsibility: DamageResponsibility;
+    reportedAt: string;
+}
+
 export interface InventoryItem {
     id:          string;
     poNumber:    string;          // links back to a pickup order
@@ -21,6 +37,7 @@ export interface InventoryItem {
     invStatus:   InventoryStatus;
     condition:   ItemCondition;
     damagedCount?: number;
+    damageReports?: DamageReport[];
     deliveredAt?: string;        // ISO timestamp
     failureNote?: string;
 }

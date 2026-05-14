@@ -23,6 +23,7 @@ type FilterType = 'ALL' | InventoryStatus;
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface ManifestListProps {
     items: InventoryItem[];
+    onReportDamage: (item: InventoryItem) => void;
 }
 
 // ─── Status Config ────────────────────────────────────────────────────────────
@@ -40,7 +41,7 @@ const CONDITION_CONFIG: Record<ItemCondition, { label: string; dot: string }> = 
     PARTIALLY_DAMAGED: { label: 'Partial Damage', dot: 'bg-amber-500' },
 };
 
-export function ManifestList({ items }: ManifestListProps) {
+export function ManifestList({ items, onReportDamage }: ManifestListProps) {
     const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
     const [activeFilter, setActiveFilter] = useState<FilterType>('ALL');
     const [searchQuery, setSearchQuery] = useState('');
@@ -148,8 +149,11 @@ export function ManifestList({ items }: ManifestListProps) {
                         </div>
                     </div>
 
-                    <button className="text-foreground/20 hover:text-foreground transition-colors">
-                        <MoreVertical size={18} />
+                    <button 
+                        onClick={() => onReportDamage(item)}
+                        className="text-foreground/20 hover:text-foreground transition-colors"
+                    >
+                        <AlertCircle size={18} />
                     </button>
                 </div>
 
@@ -181,6 +185,15 @@ export function ManifestList({ items }: ManifestListProps) {
                             <status.icon size={11} />
                             {status.label}
                         </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={() => onReportDamage(item)}
+                            className="flex-1 py-2 rounded-lg border border-red-500/20 text-red-600 text-[10px] font-bold uppercase tracking-widest hover:bg-red-50 transition-all"
+                        >
+                            Report Damage
+                        </button>
                     </div>
 
                     {/* Destination Pills */}
@@ -262,12 +275,21 @@ export function ManifestList({ items }: ManifestListProps) {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 text-right">
-                                    <div className="flex flex-wrap justify-end gap-1 max-w-[200px] ml-auto">
-                                        {item.destinations.map((dest, i) => (
-                                            <span key={i} className="px-2 py-0.5 bg-foreground/5 text-foreground/40 text-[9px] font-bold uppercase tracking-widest rounded-md truncate max-w-[80px]">
-                                                {dest}
-                                            </span>
-                                        ))}
+                                    <div className="flex items-center justify-end gap-2">
+                                        <button 
+                                            onClick={() => onReportDamage(item)}
+                                            className="p-2 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-lg transition-all"
+                                            title="Report Damage"
+                                        >
+                                            <AlertCircle size={16} />
+                                        </button>
+                                        <div className="flex flex-wrap justify-end gap-1 max-w-[150px]">
+                                            {item.destinations.map((dest, i) => (
+                                                <span key={i} className="px-2 py-0.5 bg-foreground/5 text-foreground/40 text-[9px] font-bold uppercase tracking-widest rounded-md truncate max-w-[80px]">
+                                                    {dest}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
