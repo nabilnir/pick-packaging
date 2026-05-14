@@ -6,6 +6,7 @@ import { LoadSummaryBar } from '@/components/rider/inventory/LoadSummaryBar';
 import { ManifestList } from '@/components/rider/inventory/ManifestList';
 import { DamageReportSheet } from '@/components/rider/inventory/DamageReportSheet';
 import { ReturnFlow } from '@/components/rider/inventory/ReturnFlow';
+import { ScanVerify } from '@/components/rider/inventory/ScanVerify';
 import { MOCK_INVENTORY, MOCK_VEHICLE } from '@/lib/inventory/mock-inventory';
 import { InventoryItem, DamageReport, ReturnRecord } from '@/types/inventory';
 
@@ -117,6 +118,9 @@ export default function InventoryPage() {
                     onClose={() => setReturningItem(null)}
                     onConfirm={handleReturnConfirm}
                 />
+
+                {/* ── Scan Verification ───────────────────────────────────────── */}
+                <ScanVerify items={inventoryItems} />
 
                 {/* ── Footer Stats ────────────────────────────────────────────── */}
                 <div className="mt-12 pt-6 border-t border-foreground/5 flex flex-col sm:flex-row items-center justify-between gap-4">
