@@ -5,21 +5,23 @@ import RiderLayout from '@/components/rider/rider-layout';
 import { LoadSummaryBar } from '@/components/rider/inventory/LoadSummaryBar';
 import { ManifestList } from '@/components/rider/inventory/ManifestList';
 import { DamageReportSheet } from '@/components/rider/inventory/DamageReportSheet';
+import { ReturnFlow } from '@/components/rider/inventory/ReturnFlow';
 import { MOCK_INVENTORY, MOCK_VEHICLE } from '@/lib/inventory/mock-inventory';
-import { InventoryItem, DamageReport } from '@/types/inventory';
+import { InventoryItem, DamageReport, ReturnRecord } from '@/types/inventory';
 
 export default function InventoryPage() {
     const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>(MOCK_INVENTORY);
     const [reportingItem, setReportingItem] = useState<InventoryItem | null>(null);
+    const [returningItem, setReturningItem] = useState<InventoryItem | null>(null);
 
     // ─── Stats Calculation ───────────────────────────────────────────────────
     const stats = useMemo(() => {
-        const loaded    = inventoryItems.filter(i => i.status !== 'DELIVERED' && i.status !== 'FAILED').length;
+        const loaded    = inventoryItems.filter(i => i.status !== 'DELIVERED' && i.status !== 'FAILED' && i.invStatus !== 'RETURN').length;
         const delivered = inventoryItems.filter(i => i.status === 'DELIVERED').length;
         const remaining = inventoryItems.filter(i => i.invStatus === 'PENDING' || i.invStatus === 'PARTIAL').length;
         
         const currentWeightKg = inventoryItems.reduce((acc, item) => {
-            if (item.status === 'LOADED') {
+            if (item.status === 'LOADED' && item.invStatus !== 'RETURN') {
                 return acc + (item.qtyLoaded * item.unitWeightKg);
             }
             return acc;
@@ -40,6 +42,19 @@ export default function InventoryPage() {
                     condition: newCondition,
                     damagedCount: (item.damagedCount || 0) + report.qtyAffected,
                     damageReports: [...(item.damageReports || []), report]
+                };
+            }
+            return item;
+        }));
+    };
+
+    const handleReturnConfirm = (itemId: string, record: ReturnRecord) => {
+        setInventoryItems(prev => prev.map(item => {
+            if (item.id === itemId) {
+                return {
+                    ...item,
+                    invStatus: 'RETURN',
+                    returnRecord: record
                 };
             }
             return item;
@@ -83,6 +98,7 @@ export default function InventoryPage() {
                     <ManifestList 
                         items={inventoryItems} 
                         onReportDamage={(item) => setReportingItem(item)}
+                        onMarkForReturn={(item) => setReturningItem(item)}
                     />
                 </div>
 
@@ -92,6 +108,14 @@ export default function InventoryPage() {
                     open={!!reportingItem}
                     onClose={() => setReportingItem(null)}
                     onSubmit={handleDamageSubmit}
+                />
+
+                {/* ── Return Flow Sheet ───────────────────────────────────────── */}
+                <ReturnFlow 
+                    item={returningItem}
+                    open={!!returningItem}
+                    onClose={() => setReturningItem(null)}
+                    onConfirm={handleReturnConfirm}
                 />
 
                 {/* ── Footer Stats ────────────────────────────────────────────── */}

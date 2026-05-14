@@ -19,6 +19,19 @@ export interface DamageReport {
     reportedAt: string;
 }
 
+export type ReturnReason = 'Undeliverable' | 'Damaged' | 'Wrong item' | 'Overstock';
+
+export interface ReturnRecord {
+    id: string;
+    itemId: string;
+    reason: ReturnReason;
+    qtyToReturn: number;
+    vendorName: string;
+    vendorAddress: string;
+    returnWindow: string;
+    reportedAt: string;
+}
+
 export interface InventoryItem {
     id:          string;
     poNumber:    string;          // links back to a pickup order
@@ -38,6 +51,7 @@ export interface InventoryItem {
     condition:   ItemCondition;
     damagedCount?: number;
     damageReports?: DamageReport[];
+    returnRecord?: ReturnRecord;
     deliveredAt?: string;        // ISO timestamp
     failureNote?: string;
 }
