@@ -26,10 +26,10 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/toast-provider';
 import { cn } from '@/lib/utils';
 import { 
-    InventoryItem, 
+    ManifestItem, 
     ReturnReason, 
     ReturnRecord 
-} from '@/types/inventory';
+} from '@/types/rider/inventory';
 import Image from 'next/image';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
@@ -58,7 +58,7 @@ const RETURN_REASONS: { value: ReturnReason; label: string; description: string 
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface ReturnFlowProps {
-    item: InventoryItem | null;
+    item: ManifestItem | null;
     open: boolean;
     onClose: () => void;
     onConfirm: (itemId: string, record: ReturnRecord) => void;
@@ -84,7 +84,7 @@ export function ReturnFlow({
         if (open && item) {
             setStep(1);
             setReason('');
-            setQtyToReturn(item.qtyLoaded - item.qtyDelivered);
+            setQtyToReturn(item.remainingQty);
             setSubmitting(false);
         }
     }, [open, item]);
@@ -103,7 +103,7 @@ export function ReturnFlow({
             reason: reason as ReturnReason,
             qtyToReturn,
             vendorName: item.vendorName,
-            vendorAddress: item.deliveryAddress.includes('CBD') ? 'Epping Industria Site, Cape Town' : 'Montague Gardens Hub', // Mocking vendor address
+            vendorAddress: 'Epping Industria Site, Cape Town', // Mocking vendor address
             returnWindow: '17:00 today',
             reportedAt: new Date().toISOString()
         };
@@ -127,7 +127,7 @@ export function ReturnFlow({
                 <SheetHeader className="px-6 pt-6 pb-4 border-b border-foreground/5 shrink-0">
                     <SheetTitle className="text-[18px] font-semibold flex items-center gap-2">
                         <RotateCcw size={18} className="text-red-500" />
-                        Return Items — {item.poNumber}
+                        Return Items
                     </SheetTitle>
                     
                     {/* Progress Dots */}
@@ -148,21 +148,15 @@ export function ReturnFlow({
                 {/* Body */}
                 <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
                     
-                    {/* Item Info Summary (Sticky-ish at top of scroll) */}
+                    {/* Item Info Summary */}
                     <div className="bg-foreground/[0.03] p-4 rounded-2xl flex items-center gap-4">
                         <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-white shrink-0 border border-foreground/5">
-                            {item.productImage ? (
-                                <Image src={item.productImage} alt={item.productName} fill className="object-cover" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-foreground/20">
-                                    <Package size={20} />
-                                </div>
-                            )}
+                            <Image src={item.thumbnailUrl} alt={item.productName} fill className="object-cover" />
                         </div>
                         <div className="min-w-0">
                             <p className="text-[14px] font-semibold text-foreground truncate">{item.productName}</p>
                             <p className="text-[11px] font-mono text-foreground/40 uppercase tracking-wider">
-                                {item.sku} • {item.qtyLoaded - item.qtyDelivered} loaded units
+                                {item.sku} • {item.remainingQty} units remaining
                             </p>
                         </div>
                     </div>
@@ -220,7 +214,7 @@ export function ReturnFlow({
                                         <p className="text-[11px] font-bold uppercase tracking-widest text-foreground/30 mt-1">Units</p>
                                     </div>
                                     <button 
-                                        onClick={() => setQtyToReturn(Math.min(item.qtyLoaded - item.qtyDelivered, qtyToReturn + 1))}
+                                        onClick={() => setQtyToReturn(Math.min(item.remainingQty, qtyToReturn + 1))}
                                         className="w-12 h-12 rounded-full bg-foreground/5 flex items-center justify-center text-foreground/40 hover:bg-foreground/10 hover:text-foreground transition-all"
                                     >
                                         <Plus size={24} />
@@ -229,7 +223,7 @@ export function ReturnFlow({
                                 
                                 <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-full text-[11px] font-bold">
                                     <AlertCircle size={14} />
-                                    Max {item.qtyLoaded - item.qtyDelivered} units on vehicle
+                                    Max {item.remainingQty} units available
                                 </div>
                             </div>
                         </div>
@@ -259,7 +253,7 @@ export function ReturnFlow({
                                         <MapPin size={16} className="text-foreground/30 mt-0.5 shrink-0" />
                                         <div className="space-y-1">
                                             <p className="text-[12px] font-medium text-foreground leading-snug">
-                                                {item.deliveryAddress.includes('CBD') ? 'Epping Industria Site, Cape Town' : 'Montague Gardens Hub'}
+                                                Epping Industria Site, Cape Town
                                             </p>
                                             <p className="text-[10px] text-foreground/30 uppercase tracking-widest font-bold">Address</p>
                                         </div>
@@ -272,15 +266,6 @@ export function ReturnFlow({
                                             <p className="text-[10px] text-foreground/30 uppercase tracking-widest font-bold">Return Window</p>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div className="p-4 bg-teal-50 border border-teal-100 rounded-2xl flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
-                                        <CheckCircle2 size={16} />
-                                    </div>
-                                    <p className="text-[12px] font-medium text-teal-800 leading-snug">
-                                        This stop will be added to your current route automatically.
-                                    </p>
                                 </div>
                             </div>
                         </div>

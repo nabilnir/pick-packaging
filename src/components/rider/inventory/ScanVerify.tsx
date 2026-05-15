@@ -4,11 +4,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ScanBarcode, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { cn } from '@/lib/utils';
-import { InventoryItem } from '@/types/inventory';
+import { ManifestItem } from '@/types/rider/inventory';
 import { useToast } from '@/components/ui/toast-provider';
 
 interface ScanVerifyProps {
-    items: InventoryItem[];
+    manifest: ManifestItem[];
 }
 
 interface ScanState {
@@ -17,7 +17,7 @@ interface ScanState {
     subMessage?: string;
 }
 
-export function ScanVerify({ items }: ScanVerifyProps) {
+export function ScanVerify({ manifest }: ScanVerifyProps) {
     const { success, error } = useToast();
     const [isOpen, setIsOpen] = useState(false);
     const [scannedCount, setScannedCount] = useState(0);
@@ -27,9 +27,9 @@ export function ScanVerify({ items }: ScanVerifyProps) {
     const controlsRef = useRef<IScannerControls | null>(null);
     
     // Total units that are currently LOADED and need verification
-    const totalToScan = items.reduce((acc, item) => {
-        if (item.status === 'LOADED' && item.invStatus !== 'RETURN') {
-            return acc + item.qtyLoaded;
+    const totalToScan = manifest.reduce((acc, item) => {
+        if (item.status !== 'return') {
+            return acc + item.collectedQty;
         }
         return acc;
     }, 0);
@@ -59,18 +59,16 @@ export function ScanVerify({ items }: ScanVerifyProps) {
                 osc.stop(ctx.currentTime + 0.3);
             }
         } catch (e) {
-            // Ignore if audio context fails (e.g., user hasn't interacted with page)
+            // Ignore if audio context fails
         }
     };
 
     const handleScan = useCallback((scannedSku: string) => {
-        // Prevent multiple scans of the same code too quickly
         if (scanState.status !== 'idle') return;
 
-        const foundItem = items.find(i => 
+        const foundItem = manifest.find(i => 
             i.sku.toLowerCase() === scannedSku.toLowerCase() && 
-            i.status === 'LOADED' && 
-            i.invStatus !== 'RETURN'
+            i.status !== 'return'
         );
 
         if (foundItem) {
@@ -78,7 +76,7 @@ export function ScanVerify({ items }: ScanVerifyProps) {
             setScanState({
                 status: 'success',
                 message: foundItem.productName,
-                subMessage: `SKU: ${foundItem.sku} • Expected: ${foundItem.qtyLoaded}`
+                subMessage: `SKU: ${foundItem.sku} • Count: ${foundItem.collectedQty}`
             });
             setScannedCount(prev => Math.min(prev + 1, totalToScan));
             
@@ -97,13 +95,12 @@ export function ScanVerify({ items }: ScanVerifyProps) {
                 setScanState({ status: 'idle', message: '' });
             }, 2000);
         }
-    }, [items, scanState.status, totalToScan]);
+    }, [manifest, scanState.status, totalToScan]);
 
     const startScanner = async () => {
         try {
             const codeReader = new BrowserMultiFormatReader();
             const videoElement = videoRef.current;
-            
             if (!videoElement) return;
 
             const controls = await codeReader.decodeFromVideoDevice(
@@ -130,7 +127,6 @@ export function ScanVerify({ items }: ScanVerifyProps) {
         }
     };
 
-    // Manage scanner lifecycle
     useEffect(() => {
         if (isOpen) {
             startScanner();
@@ -138,10 +134,7 @@ export function ScanVerify({ items }: ScanVerifyProps) {
             stopScanner();
             setScanState({ status: 'idle', message: '' });
         }
-        
-        return () => {
-            stopScanner();
-        };
+        return () => stopScanner();
     }, [isOpen]);
 
     return (
@@ -160,7 +153,6 @@ export function ScanVerify({ items }: ScanVerifyProps) {
             {/* Scanner Overlay */}
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex flex-col bg-black">
-                    {/* Header */}
                     <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-6 bg-gradient-to-b from-black/80 to-transparent">
                         <div>
                             <h2 className="text-white font-semibold text-[17px]">Scan Verification</h2>
@@ -174,7 +166,6 @@ export function ScanVerify({ items }: ScanVerifyProps) {
                         </button>
                     </div>
 
-                    {/* Camera Viewport */}
                     <div className="relative flex-1 bg-black overflow-hidden flex items-center justify-center">
                         <video 
                             ref={videoRef}
@@ -183,17 +174,14 @@ export function ScanVerify({ items }: ScanVerifyProps) {
                             muted
                         />
                         
-                        {/* Scanning Frame Overlay */}
                         <div className="absolute inset-0 z-10 pointer-events-none">
                             <div className="w-full h-full border-[60px] sm:border-[100px] border-black/40">
                                 <div className="w-full h-full border-2 border-white/30 relative">
-                                    {/* Corner markers */}
                                     <div className="absolute -top-0.5 -left-0.5 w-8 h-8 border-t-4 border-l-4 border-[#1c3a2a]" />
                                     <div className="absolute -top-0.5 -right-0.5 w-8 h-8 border-t-4 border-r-4 border-[#1c3a2a]" />
                                     <div className="absolute -bottom-0.5 -left-0.5 w-8 h-8 border-b-4 border-l-4 border-[#1c3a2a]" />
                                     <div className="absolute -bottom-0.5 -right-0.5 w-8 h-8 border-b-4 border-r-4 border-[#1c3a2a]" />
                                     
-                                    {/* Animated scanning line */}
                                     {scanState.status === 'idle' && (
                                         <div className="absolute top-0 left-0 w-full h-0.5 bg-green-400/80 shadow-[0_0_8px_2px_rgba(74,222,128,0.5)] animate-[scan_2s_ease-in-out_infinite]" />
                                     )}
@@ -201,7 +189,6 @@ export function ScanVerify({ items }: ScanVerifyProps) {
                             </div>
                         </div>
 
-                        {/* Status Flash Overlay */}
                         <div className={cn(
                             "absolute inset-0 z-20 flex flex-col items-center justify-center p-6 text-center transition-opacity duration-300 pointer-events-none",
                             scanState.status === 'success' ? "bg-teal-600/90 opacity-100" :
@@ -209,44 +196,30 @@ export function ScanVerify({ items }: ScanVerifyProps) {
                         )}>
                             {scanState.status === 'success' && <CheckCircle2 size={64} className="text-white mb-4 drop-shadow-md" />}
                             {scanState.status === 'error' && <AlertCircle size={64} className="text-white mb-4 drop-shadow-md" />}
-                            
-                            <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-md">
-                                {scanState.message}
-                            </h3>
+                            <h3 className="text-white text-2xl font-bold mb-2 drop-shadow-md">{scanState.message}</h3>
                             {scanState.subMessage && (
-                                <p className="text-white/90 text-sm font-medium bg-black/20 px-4 py-2 rounded-lg backdrop-blur-sm">
-                                    {scanState.subMessage}
-                                </p>
+                                <p className="text-white/90 text-sm font-medium bg-black/20 px-4 py-2 rounded-lg backdrop-blur-sm">{scanState.subMessage}</p>
                             )}
                         </div>
                     </div>
 
-                    {/* Footer Progress */}
                     <div className="bg-white px-6 pb-8 pt-6 rounded-t-3xl absolute bottom-0 left-0 right-0 z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-[12px] font-bold uppercase tracking-widest text-foreground/40">
-                                Verification Progress
-                            </span>
+                            <span className="text-[12px] font-bold uppercase tracking-widest text-foreground/40">Verification Progress</span>
                             <span className="text-[14px] font-bold text-[#1c3a2a] tabular-nums">
                                 {scannedCount} <span className="text-foreground/30 font-medium">/ {totalToScan} items</span>
                             </span>
                         </div>
-                        
                         <div className="h-2.5 w-full bg-foreground/[0.05] rounded-full overflow-hidden">
                             <div 
                                 className="h-full bg-[#1c3a2a] rounded-full transition-all duration-500 ease-out"
                                 style={{ width: `${totalToScan > 0 ? (scannedCount / totalToScan) * 100 : 0}%` }}
                             />
                         </div>
-                        
-                        <p className="text-center text-[12px] text-foreground/50 font-medium mt-5">
-                            Keep scanning items as you load them onto the vehicle.
-                        </p>
                     </div>
                 </div>
             )}
 
-            {/* Scanning line animation */}
             <style jsx global>{`
                 @keyframes scan {
                     0% { top: 0; }

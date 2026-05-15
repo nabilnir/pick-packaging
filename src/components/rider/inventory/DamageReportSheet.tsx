@@ -30,12 +30,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/toast-provider';
 import { cn } from '@/lib/utils';
 import { 
-    InventoryItem, 
+    ManifestItem, 
     DamageType, 
     DamageSeverity, 
     DamageResponsibility,
     DamageReport
-} from '@/types/inventory';
+} from '@/types/rider/inventory';
 import Image from 'next/image';
 
 // ─── Constants ──────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ const RESPONSIBILITY_OPTIONS: { value: DamageResponsibility; label: string }[] =
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface DamageReportSheetProps {
-    item: InventoryItem | null;
+    item: ManifestItem | null;
     open: boolean;
     onClose: () => void;
     onSubmit: (itemId: string, report: DamageReport) => void;
@@ -133,7 +133,6 @@ export function DamageReportSheet({
         success(`Damage reported for ${item.sku}`);
         
         if (responsibility === 'Vendor') {
-            // Internal flag simulation
             console.log(`FLAGGED VENDOR: ${item.vendorName} for admin review regarding ${item.sku}`);
         }
 
@@ -156,13 +155,7 @@ export function DamageReportSheet({
                     </div>
                     <div className="flex items-center gap-3 mt-3 bg-foreground/5 p-3 rounded-xl">
                         <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-white shrink-0">
-                            {item.productImage ? (
-                                <Image src={item.productImage} alt={item.productName} fill className="object-cover" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-foreground/20">
-                                    <AlertTriangle size={20} />
-                                </div>
-                            )}
+                            <Image src={item.thumbnailUrl} alt={item.productName} fill className="object-cover" />
                         </div>
                         <div className="min-w-0">
                             <p className="text-[13px] font-semibold text-foreground truncate">{item.productName}</p>
@@ -203,14 +196,14 @@ export function DamageReportSheet({
                                 </button>
                                 <span className="text-[14px] font-bold w-4 text-center tabular-nums">{qtyAffected}</span>
                                 <button 
-                                    onClick={() => setQtyAffected(Math.min(item.qtyLoaded, qtyAffected + 1))}
+                                    onClick={() => setQtyAffected(Math.min(item.collectedQty, qtyAffected + 1))}
                                     className="p-1 hover:bg-foreground/5 rounded-md transition-colors"
                                 >
                                     <Plus size={16} />
                                 </button>
                             </div>
                         </div>
-                        <p className="text-[10px] text-foreground/30 font-medium">Max available: {item.qtyLoaded} units</p>
+                        <p className="text-[10px] text-foreground/30 font-medium">Max available: {item.collectedQty} units</p>
                     </div>
 
                     {/* Severity */}
