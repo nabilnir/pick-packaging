@@ -1,59 +1,44 @@
 export type StopStatus = 'upcoming' | 'current' | 'completed' | 'failed';
 
-export interface StopLineItem {
+export interface StopItem {
     sku: string;
     productName: string;
     qty: number;
 }
 
-export interface DeliveredLineItem extends StopLineItem {
+export interface DeliveredItem extends StopItem {
     deliveredQty: number;
     shortageReason?: string;
 }
 
 export interface PODRecord {
-    id: string;
-    stopId: string;
-    receivedByName: string;
-    recipientRole?: string;
-    signatureDataUrl: string;
-    photoDataUrl: string;
-    deliveredItems: DeliveredLineItem[];
-    submittedAt: string;
-}
-
-export type FailureReason = 
-    | 'Recipient not available'
-    | 'Business closed'
-    | 'Address not found'
-    | 'Access denied'
-    | 'Refused delivery'
-    | 'Time window missed';
-
-export interface FailedDeliveryRecord {
-    id: string;
-    stopId: string;
-    reason: FailureReason;
-    notes?: string;
-    photoDataUrl?: string;
-    requestReschedule: boolean;
-    rescheduleWindow?: string;
-    reportedAt: string;
+    receivedBy: string;
+    receiverRole?: string;
+    signatureBase64: string;
+    photoUrl: string;
+    deliveredItems: DeliveredItem[];
+    timestamp: string;
 }
 
 export interface DeliveryStop {
     id: string;
-    stopNumber: number;
-    status: StopStatus;
+    sequence: number; // Stop number
     companyName: string;
     address: string;
     contactName?: string;
     contactPhone?: string;
-    items: StopLineItem[];
-    etaTime: string;            // e.g. "14:20"
-    arrivalMins?: number;       // live countdown in minutes (current stop)
-    deliveredAt?: string;       // e.g. "11:42"
+    items: StopItem[];
+    status: StopStatus;
+    estimatedArrival: string;
+    arrivedAt?: string;
+    completedAt?: string;
+    failedReason?: string;
     podRecord?: PODRecord;
-    failedRecord?: FailedDeliveryRecord;
-    failureReason?: string;
+}
+
+export interface RouteProgress {
+    completedStops: number;
+    totalStops: number;
+    distanceRemainingKm: number;
+    currentEta: string;
 }

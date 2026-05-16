@@ -14,14 +14,16 @@ import {
     Clock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DeliveryStop, StopLineItem } from '@/types/rider/logistics';
+import { DeliveryStop, StopItem } from '@/types/rider/logistics';
 import Image from 'next/image';
 
 interface StopListProps {
     stops: DeliveryStop[];
+    currentStopId?: string;
+    onStopExpand?: (stop: DeliveryStop | null) => void;
 }
 
-function StopItemsList({ items }: { items: StopLineItem[] }) {
+function StopItemsList({ items }: { items: StopItem[] }) {
     return (
         <div className="mt-4 pt-4 border-t border-foreground/5 space-y-3">
             <h4 className="text-[11px] font-bold uppercase tracking-[0.15em] text-foreground/40">
@@ -48,11 +50,14 @@ function StopItemsList({ items }: { items: StopLineItem[] }) {
     );
 }
 
-export function StopList({ stops }: StopListProps) {
+export function StopList({ stops, currentStopId, onStopExpand }: StopListProps) {
     const [expandedStopId, setExpandedStopId] = useState<string | null>(null);
 
-    const toggleExpand = (id: string) => {
-        setExpandedStopId(prev => prev === id ? null : id);
+    const toggleExpand = (stop: DeliveryStop) => {
+        const isCurrentlyExpanded = expandedStopId === stop.id;
+        const nextId = isCurrentlyExpanded ? null : stop.id;
+        setExpandedStopId(nextId);
+        if (onStopExpand) onStopExpand(nextId ? stop : null);
     };
 
     return (
@@ -60,6 +65,7 @@ export function StopList({ stops }: StopListProps) {
             {stops.map((stop) => {
                 const totalUnits = stop.items.reduce((sum, item) => sum + item.qty, 0);
                 const isExpanded = expandedStopId === stop.id;
+                const isCurrent = stop.id === currentStopId || stop.status === 'current';
 
                 // ─── UPCOMING ────────────────────────────────────────────────
                 if (stop.status === 'upcoming') {
@@ -67,12 +73,12 @@ export function StopList({ stops }: StopListProps) {
                         <div 
                             key={stop.id}
                             className="bg-white border border-foreground/5 rounded-2xl p-5 hover:shadow-sm transition-all cursor-pointer"
-                            onClick={() => toggleExpand(stop.id)}
+                            onClick={() => toggleExpand(stop)}
                         >
                             <div className="flex justify-between items-start gap-4">
                                 <div className="space-y-1">
                                     <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-foreground/5 text-[10px] font-bold uppercase tracking-widest text-foreground/50 mb-1">
-                                        Stop {stop.stopNumber}
+                                        Stop {stop.sequence}
                                     </div>
                                     <h3 className="text-[15px] font-bold text-foreground">{stop.companyName}</h3>
                                     <p className="text-[13px] text-foreground/60 leading-snug line-clamp-2 pr-4">
@@ -80,7 +86,7 @@ export function StopList({ stops }: StopListProps) {
                                     </p>
                                 </div>
                                 <div className="text-right shrink-0">
-                                    <p className="text-[13px] font-bold text-foreground">{stop.etaTime}</p>
+                                    <p className="text-[13px] font-bold text-foreground">{stop.estimatedArrival}</p>
                                     <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-foreground/40 mt-0.5">ETA</p>
                                 </div>
                             </div>
@@ -106,7 +112,7 @@ export function StopList({ stops }: StopListProps) {
                 }
 
                 // ─── CURRENT ─────────────────────────────────────────────────
-                if (stop.status === 'current') {
+                if (stop.status === 'current' || isCurrent) {
                     return (
                         <div 
                             key={stop.id}
@@ -124,7 +130,7 @@ export function StopList({ stops }: StopListProps) {
                                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                                               <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                                             </span>
-                                            Stop {stop.stopNumber}
+                                            Stop {stop.sequence}
                                         </div>
                                         <h3 className="text-[18px] font-bold text-foreground">{stop.companyName}</h3>
                                         <p className="text-[14px] text-foreground/70 leading-snug pr-4">
@@ -132,17 +138,10 @@ export function StopList({ stops }: StopListProps) {
                                         </p>
                                     </div>
                                     <div className="text-right shrink-0 bg-teal-50 px-3 py-2 rounded-xl">
-                                        <p className="text-[16px] font-bold text-teal-800">{stop.etaTime}</p>
+                                        <p className="text-[16px] font-bold text-teal-800">{stop.estimatedArrival}</p>
                                         <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-teal-600 mt-0.5">ETA</p>
                                     </div>
                                 </div>
-
-                                {stop.arrivalMins !== undefined && (
-                                    <div className="flex items-center gap-2 text-amber-600 bg-amber-50 px-3 py-2 rounded-xl text-[12px] font-medium">
-                                        <Clock size={14} />
-                                        You should arrive in ~{stop.arrivalMins} min
-                                    </div>
-                                )}
 
                                 <div className="flex items-center justify-between border-t border-foreground/5 pt-4">
                                     <div>
@@ -169,7 +168,7 @@ export function StopList({ stops }: StopListProps) {
 
                                 <div 
                                     className="flex items-center justify-between cursor-pointer group"
-                                    onClick={() => toggleExpand(stop.id)}
+                                    onClick={() => toggleExpand(stop)}
                                 >
                                     <p className="text-[13px] font-medium text-foreground">
                                         {stop.items.length} SKUs · {totalUnits} units to deliver
@@ -180,21 +179,6 @@ export function StopList({ stops }: StopListProps) {
                                 </div>
 
                                 {isExpanded && <StopItemsList items={stop.items} />}
-
-                                {/* Action bar placeholder - will be filled by Component 3 */}
-                                <div className="pt-4 border-t border-foreground/5 flex gap-3">
-                                    <a 
-                                        href={`https://maps.google.com/?q=${encodeURIComponent(stop.address)}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex-1 py-3.5 border border-[#1c3a2a]/20 text-[#1c3a2a] rounded-xl text-[12px] font-bold uppercase tracking-[0.1em] flex items-center justify-center gap-2 hover:bg-[#1c3a2a]/5 transition-all"
-                                    >
-                                        Navigate
-                                    </a>
-                                    <button className="flex-1 py-3.5 bg-[#1c3a2a] text-white rounded-xl text-[12px] font-bold uppercase tracking-[0.1em] hover:bg-[#152d20] transition-all">
-                                        Deliver
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     );
@@ -220,18 +204,10 @@ export function StopList({ stops }: StopListProps) {
                                     </p>
                                 </div>
                                 <div className="text-right shrink-0">
-                                    <p className="text-[12px] font-bold text-foreground">{stop.deliveredAt}</p>
+                                    <p className="text-[12px] font-bold text-foreground">{stop.completedAt}</p>
                                     <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-foreground/40 mt-0.5">Delivered</p>
                                 </div>
                             </div>
-                            
-                            {stop.podPhotoUrl && (
-                                <div className="mt-4 pt-3 border-t border-foreground/5 flex justify-end">
-                                    <button className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-teal-600 hover:text-teal-700">
-                                        View POD <ImageIcon size={12} />
-                                    </button>
-                                </div>
-                            )}
                         </div>
                     );
                 }
@@ -250,12 +226,9 @@ export function StopList({ stops }: StopListProps) {
                                     </div>
                                     <h3 className="text-[15px] font-bold text-foreground">{stop.companyName}</h3>
                                     <p className="text-[13px] text-red-600/80 font-medium mt-1">
-                                        {stop.failureReason || 'Delivery failed'}
+                                        {stop.failedReason || 'Delivery failed'}
                                     </p>
                                 </div>
-                                <button className="shrink-0 text-[11px] font-bold uppercase tracking-widest text-foreground/40 hover:text-foreground">
-                                    Reschedule
-                                </button>
                             </div>
                         </div>
                     );
