@@ -107,12 +107,18 @@ export default function MiniCart() {
                                     <div className="flex gap-5">
                                         {/* Image */}
                                         <div className="relative w-20 h-20 rounded-[8px] bg-foreground/5 flex-shrink-0 overflow-hidden">
-                                            <Image
-                                                src={item.image}
-                                                alt={item.name}
-                                                fill
-                                                className="object-contain p-2"
-                                            />
+                                            {item.image ? (
+                                                <Image
+                                                    src={item.image}
+                                                    alt={item.name}
+                                                    fill
+                                                    className="object-contain p-2"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-foreground/20">
+                                                    <Package size={24} />
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Info */}

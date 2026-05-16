@@ -22,6 +22,25 @@ export interface PODRecord {
     submittedAt: string;
 }
 
+export type FailureReason = 
+    | 'Recipient not available'
+    | 'Business closed'
+    | 'Address not found'
+    | 'Access denied'
+    | 'Refused delivery'
+    | 'Time window missed';
+
+export interface FailedDeliveryRecord {
+    id: string;
+    stopId: string;
+    reason: FailureReason;
+    notes?: string;
+    photoDataUrl?: string;
+    requestReschedule: boolean;
+    rescheduleWindow?: string;
+    reportedAt: string;
+}
+
 export interface DeliveryStop {
     id: string;
     stopNumber: number;
@@ -35,5 +54,6 @@ export interface DeliveryStop {
     arrivalMins?: number;       // live countdown in minutes (current stop)
     deliveredAt?: string;       // e.g. "11:42"
     podRecord?: PODRecord;
+    failedRecord?: FailedDeliveryRecord;
     failureReason?: string;
 }

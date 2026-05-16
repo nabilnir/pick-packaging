@@ -2,47 +2,47 @@
 
 import React, { useState, useMemo } from 'react';
 import RiderLayout from '@/components/rider/rider-layout';
+import { RiderPageHeader } from '@/components/rider/RiderPageHeader';
 import { LoadSummaryBar } from '@/components/rider/inventory/LoadSummaryBar';
 import { ManifestList } from '@/components/rider/inventory/ManifestList';
 import { DamageReportSheet } from '@/components/rider/inventory/DamageReportSheet';
 import { ReturnFlow } from '@/components/rider/inventory/ReturnFlow';
 import { ScanVerify } from '@/components/rider/inventory/ScanVerify';
-import { MOCK_INVENTORY, MOCK_VEHICLE } from '@/lib/inventory/mock-inventory';
-import { InventoryItem, DamageReport, ReturnRecord } from '@/types/inventory';
+import { MOCK_MANIFEST, MOCK_VEHICLE } from '@/lib/rider/mock-inventory';
+import { ManifestItem, DamageReport, ReturnRecord } from '@/types/rider/inventory';
 
 export default function InventoryPage() {
-    const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>(MOCK_INVENTORY);
-    const [reportingItem, setReportingItem] = useState<InventoryItem | null>(null);
-    const [returningItem, setReturningItem] = useState<InventoryItem | null>(null);
+    const [manifestItems, setManifestItems] = useState<ManifestItem[]>(MOCK_MANIFEST);
+    const [damageItem, setDamageItem] = useState<ManifestItem | null>(null);
+    const [returnItem, setReturnItem] = useState<ManifestItem | null>(null);
 
     // ─── Stats Calculation ───────────────────────────────────────────────────
     const stats = useMemo(() => {
-        const loaded    = inventoryItems.filter(i => i.status !== 'DELIVERED' && i.status !== 'FAILED' && i.invStatus !== 'RETURN').length;
-        const delivered = inventoryItems.filter(i => i.status === 'DELIVERED').length;
-        const remaining = inventoryItems.filter(i => i.invStatus === 'PENDING' || i.invStatus === 'PARTIAL').length;
+        const loaded    = manifestItems.filter(i => i.status !== 'return').length;
+        const delivered = manifestItems.filter(i => i.status === 'complete').length;
+        const remaining = manifestItems.filter(i => i.status === 'pending' || i.status === 'partial').length;
         
-        const currentWeightKg = inventoryItems.reduce((acc, item) => {
-            if (item.status === 'LOADED' && item.invStatus !== 'RETURN') {
-                return acc + (item.qtyLoaded * item.unitWeightKg);
+        const currentWeightKg = manifestItems.reduce((acc, item) => {
+            if (item.status !== 'return') {
+                return acc + (item.collectedQty * item.unitWeightKg);
             }
             return acc;
         }, 0);
 
         return { loaded, delivered, remaining, currentWeightKg };
-    }, [inventoryItems]);
+    }, [manifestItems]);
 
-    const subtitle = `${stats.loaded} items loaded · ${stats.delivered} delivered · ${stats.remaining} remaining`;
+    const summaryLine = `${stats.loaded} items loaded · ${stats.delivered} delivered · ${stats.remaining} remaining`;
 
     // ─── Handlers ─────────────────────────────────────────────────────────────
     const handleDamageSubmit = (itemId: string, report: DamageReport) => {
-        setInventoryItems(prev => prev.map(item => {
+        setManifestItems(prev => prev.map(item => {
             if (item.id === itemId) {
-                const newCondition = report.qtyAffected === item.qtyLoaded ? 'DAMAGED' : 'PARTIALLY_DAMAGED';
+                const newCondition = report.qtyAffected === item.collectedQty ? 'damaged' : 'partially_damaged';
                 return {
                     ...item,
                     condition: newCondition,
-                    damagedCount: (item.damagedCount || 0) + report.qtyAffected,
-                    damageReports: [...(item.damageReports || []), report]
+                    damageReport: report
                 };
             }
             return item;
@@ -50,11 +50,11 @@ export default function InventoryPage() {
     };
 
     const handleReturnConfirm = (itemId: string, record: ReturnRecord) => {
-        setInventoryItems(prev => prev.map(item => {
+        setManifestItems(prev => prev.map(item => {
             if (item.id === itemId) {
                 return {
                     ...item,
-                    invStatus: 'RETURN',
+                    status: 'return',
                     returnRecord: record
                 };
             }
@@ -64,22 +64,12 @@ export default function InventoryPage() {
 
     return (
         <RiderLayout>
-            <div className="max-w-6xl mx-auto">
-                {/* ── Page Header ───────────────────────────────────────────── */}
-                <div className="mb-7 pb-6 border-b border-foreground/[0.07]">
-                    <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-foreground/35 mb-1">
-                        Rider Portal · Sector 4
-                    </p>
-                    <h1 className="font-display text-[2rem] font-light text-foreground tracking-tight">
-                        Inventory
-                    </h1>
-                    <p className="text-[14px] font-light text-foreground/45 mt-1">
-                        {subtitle}
-                    </p>
-                </div>
+            <div className="max-w-6xl mx-auto pb-24">
+                <div className="p-4 space-y-4">
+                    {/* ── Page Header ───────────────────────────────────────────── */}
+                    <RiderPageHeader title="Inventory" subtitle={summaryLine} />
 
-                {/* ── Load Summary Bar ────────────────────────────────────────── */}
-                <div className="mb-8">
+                    {/* ── Load Summary Bar ────────────────────────────────────────── */}
                     <LoadSummaryBar 
                         loaded={stats.loaded}
                         delivered={stats.delivered}
@@ -87,50 +77,33 @@ export default function InventoryPage() {
                         currentWeightKg={stats.currentWeightKg}
                         maxWeightKg={MOCK_VEHICLE.maxWeightKg}
                     />
-                </div>
 
-                {/* ── Manifest List ───────────────────────────────────────────── */}
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/30">
-                            Current Manifest
-                        </h2>
-                    </div>
+                    {/* ── Manifest List ───────────────────────────────────────────── */}
                     <ManifestList 
-                        items={inventoryItems} 
-                        onReportDamage={(item) => setReportingItem(item)}
-                        onMarkForReturn={(item) => setReturningItem(item)}
+                        items={manifestItems} 
+                        onReportDamage={(item) => setDamageItem(item)}
+                        onMarkForReturn={(item) => setReturnItem(item)}
                     />
                 </div>
+                
+                {/* ── Scan Verification ───────────────────────────────────────── */}
+                <ScanVerify manifest={manifestItems} />
 
                 {/* ── Damage Report Sheet ─────────────────────────────────────── */}
                 <DamageReportSheet 
-                    item={reportingItem}
-                    open={!!reportingItem}
-                    onClose={() => setReportingItem(null)}
+                    item={damageItem}
+                    open={!!damageItem}
+                    onClose={() => setDamageItem(null)}
                     onSubmit={handleDamageSubmit}
                 />
 
                 {/* ── Return Flow Sheet ───────────────────────────────────────── */}
                 <ReturnFlow 
-                    item={returningItem}
-                    open={!!returningItem}
-                    onClose={() => setReturningItem(null)}
+                    item={returnItem}
+                    open={!!returnItem}
+                    onClose={() => setReturnItem(null)}
                     onConfirm={handleReturnConfirm}
                 />
-
-                {/* ── Scan Verification ───────────────────────────────────────── */}
-                <ScanVerify items={inventoryItems} />
-
-                {/* ── Footer Stats ────────────────────────────────────────────── */}
-                <div className="mt-12 pt-6 border-t border-foreground/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="text-[12px] text-foreground/40 font-medium italic">
-                        Vehicle: {MOCK_VEHICLE.registration} ({MOCK_VEHICLE.type})
-                    </div>
-                    <div className="text-[11px] font-bold uppercase tracking-widest text-foreground/30">
-                        Last synced: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                </div>
             </div>
         </RiderLayout>
     );
